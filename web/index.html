@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine Game</title>
+    <!-- Add Materialize CSS link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <nav class="top-nav">
+        <a href="#" data-target="nav-mobile" class="top-nav sidenav-trigger full hide-on-large-only">
+            <i class="material-icons" style="margin-right: 10px;">menu</i>
+        </a>
+        <span id="slot-name-label" style="text-align: center; flex-grow: 1;">Emoji Slot Game</span>
+    </nav>
+    <div id="nav-mobile" class="sidenav sidenav-fixed" style="transform: translateX(-105%);">
+        <!--
+        <h2>Other Slots</h2>
+        <div id="slot-div" class="icon-grid">
+            <span class="slot-button">🍓</span>
+            <span class="slot-button">🍓</span>
+            <span class="slot-button">🍓</span>
+            <span class="slot-button">🍓</span>
+            <span class="slot-button">🍓</span>
+            <span class="slot-button">🍓</span>
+            <span class="slot-button">🍓</span>
+        </div>
+        -->
+        <h2>Pay Table</h2>
+        <div id="pay-table">
+        </div>
+    </div>
+
+</header>
+<main>
+    <div>
+    <div class="slot-machine">
+        <div class="slot-grid row">
+            <div class="symbol reel0 line0"></div>
+            <div class="symbol reel1 line0"></div>
+            <div class="symbol reel2 line0"></div>
+            <div class="symbol reel3 line0"></div>
+            <div class="symbol reel4 line0"></div>
+            <div class="symbol reel0 line1"></div>
+            <div class="symbol reel1 line1"></div>
+            <div class="symbol reel2 line1"></div>
+            <div class="symbol reel3 line1"></div>
+            <div class="symbol reel4 line1"></div>
+            <div class="symbol reel0 line2"></div>
+            <div class="symbol reel1 line2"></div>
+            <div class="symbol reel2 line2"></div>
+            <div class="symbol reel3 line2"></div>
+            <div class="symbol reel4 line2"></div>
+            <div class="symbol reel0 line3"></div>
+            <div class="symbol reel1 line3"></div>
+            <div class="symbol reel2 line3"></div>
+            <div class="symbol reel3 line3"></div>
+            <div class="symbol reel4 line3"></div>
+            <div class="symbol reel0 line4"></div>
+            <div class="symbol reel1 line4"></div>
+            <div class="symbol reel2 line4"></div>
+            <div class="symbol reel3 line4"></div>
+            <div class="symbol reel4 line4"></div>
+        </div>
+        <div class="betting-menu">
+            <div class="betting-controls">
+                <button class="btn btn-small disabled">Up</button>
+                <label>
+                    <select class="browser-default">
+                        <option value="1" selected>$25</option>
+                        <option value="5" disabled>$50</option>
+                        <option value="10" disabled>$100</option>
+                    </select>
+                </label>
+                <button class="btn btn-small disabled">Dn</button>
+            </div>
+            <div class="win-amount">$0</div>
+            <button class="btn spin-btn">Spin</button>
+        </div>
+    </div>
+    <div class="wallet">
+        <span class="teal-text text-darken-2">$ 0</span>
+    </div>
+    </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="script/ui.js" type="application/javascript"></script>
+<script src="script/network.js" type="application/javascript"></script>
+<script src="script/slot.js" type="application/javascript"></script>
+
+</body>
+</html>
