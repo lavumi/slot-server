@@ -1,0 +1,11 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+
+message Request {
+  uint32 SlotId = 1;
+  float BetCash = 2;
+  uint32 BetLine = 3;
+  string PrevState = 4;
+}

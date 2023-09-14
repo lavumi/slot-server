@@ -1,6 +1,6 @@
 [[SlotGames]]
 id = 0
-parSheet = "slot00.toml"
+parSheet = "foodie.toml"
 open = true
 
 #[[SlotGames]]

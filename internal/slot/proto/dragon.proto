@@ -1,0 +1,27 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+
+import "base/result.proto";
+import "base/request.proto";
+import "base/freespin.proto";
+
+
+
+
+message Jackpot {
+  float win = 1;
+  uint32 jackpot = 2;
+}
+
+
+message DragonReelResult {
+  BaseResult res = 1;
+  FreeSpin free = 2;
+    Jackpot jackpot = 3;
+}
+
+service DragonReel {
+  rpc Spin(Request) returns (DragonReelResult);
+}

@@ -49,7 +49,8 @@ Listed below are the versions of the frameworks used in this project.
 │       ├── config/             # Config struct
 │       ├── model/              # models for slot
 │       ├── module/             # modules
-│       ├── slot00/             # slot 0
+│       ├── game/               # Slot main logics
+│       │     └── foodie/       # Foodie Reels (Slot00)
 │       └── manager.go          # manager
 └── web/                        # Not used. We had plans to set up RAID 1 later.
     ├── config/                 # configs for client ( symbol data and paytable )

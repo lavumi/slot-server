@@ -1,4 +1,4 @@
-package slot00
+package foodie
 
 import (
 	"slot-server/internal/slot/module"

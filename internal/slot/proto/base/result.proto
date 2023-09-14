@@ -1,0 +1,26 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+
+message Strip {
+ repeated sfixed32 symbol = 1;
+}
+
+message AllLineWin {
+ float win = 1;
+ repeated sfixed32 position = 2;
+}
+
+message BaseResult {
+ float win = 1;
+ float totalWin = 2;
+ repeated sfixed32 upSymbol = 3;
+ repeated Strip reel = 4;
+ repeated sfixed32 dnSymbol = 5;
+ repeated AllLineWin lineWins = 6;
+ bool collectable = 7;
+ string state = 8;
+}
+
+

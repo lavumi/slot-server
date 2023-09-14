@@ -2,9 +2,9 @@ package slot
 
 import (
 	"fmt"
+	"slot-server/internal/slot/game/foodie"
 	"slot-server/internal/slot/model"
 	"slot-server/internal/slot/module"
-	"slot-server/internal/slot/slot00"
 )
 
 type Manager struct {
@@ -18,7 +18,7 @@ func Initialize() *Manager {
 		slots: slots,
 	}
 
-	slots[0] = slot00.Init()
+	slots[0] = foodie.Init()
 
 	return &manager
 }

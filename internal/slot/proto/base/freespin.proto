@@ -1,0 +1,9 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+message FreeSpin {
+  float win = 1;
+  uint32 remain = 2;
+  uint32 max = 3;
+}

@@ -1,4 +1,4 @@
-package slot00
+package foodie
 
 import (
 	"github.com/BurntSushi/toml"
@@ -9,7 +9,7 @@ import (
 
 func Init() *ParSheet {
 	var ps ParSheet
-	_, err := toml.DecodeFile("./configs/slot00.toml", &ps)
+	_, err := toml.DecodeFile("./configs/foodie.toml", &ps)
 	if err != nil {
 		log.Fatal(err)
 	}
