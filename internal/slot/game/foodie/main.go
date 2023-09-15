@@ -3,13 +3,17 @@ package foodie
 import (
 	"github.com/BurntSushi/toml"
 	"log"
+	"slot-server/internal/slot/api"
+	"slot-server/internal/slot/api/proto"
 	"slot-server/internal/slot/model"
 	"slot-server/internal/slot/module"
 )
 
-func Init() *ParSheet {
-	var ps ParSheet
-	_, err := toml.DecodeFile("./configs/foodie.toml", &ps)
+var ps ParSheet
+
+func init() {
+
+	_, err := toml.DecodeFile("./parSheet/foodie.toml", &ps)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,34 +21,36 @@ func Init() *ParSheet {
 	for _, strip := range ps.Strips {
 		strip.StakingWeight()
 	}
-
-	return &ps
 }
 
-func (m *ParSheet) Spin(_ interface{}, bet float64) (*model.SpinOutput, *model.Error) {
-
-	grid := module.GenRandomGrid(m.Strips, m.Column)
-
-	lineWins := module.AllLineWins(grid, m.Pays, bet)
+func Spin(req *proto.Request) (*proto.Response, *model.Error) {
+	grid := module.GenRandomGrid(ps.Strips, ps.Column)
+	lineWins := module.AllLineWins(grid, ps.Pays, float64(req.BetCash))
 
 	totalWin := 0.0
 	for _, win := range lineWins {
 		totalWin += win.Win
 	}
 
-	upSymbols := []int{11, 12, 13, 14, 10}
-	downSymbols := []int{11, 12, 13, 14, 10}
+	upSymbols := []int32{11, 12, 13, 14, 10}
+	downSymbols := []int32{11, 12, 13, 14, 10}
 
-	bonus := Bonus{FreeSpin: "15"}
-
-	return &model.SpinOutput{
-		Win:         totalWin,
-		TotalWin:    totalWin,
-		Symbols:     grid,
-		UpSymbols:   upSymbols,
-		DownSymbols: downSymbols,
-		LineWins:    lineWins,
-		BonusWins:   []model.BonusWin{bonus},
-		NextProcess: nil,
+	return &proto.Response{
+		Res: &proto.BaseResult{
+			Win:      float32(totalWin),
+			TotalWin: float32(totalWin),
+			UpSymbol: upSymbols,
+			Reel:     api.GridConvert(grid),
+			DnSymbol: downSymbols,
+			LineWins: api.LinePayConvert(&lineWins),
+		},
+		Bonus: &proto.Response_Foodie{
+			Foodie: &proto.FoodieBonus{Free: &proto.FreeSpin{
+				Win:    0,
+				Remain: 0,
+				Max:    0,
+			}},
+		},
+		State: "",
 	}, nil
 }

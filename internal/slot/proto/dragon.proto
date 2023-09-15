@@ -4,7 +4,6 @@ option go_package = "./proto";
 
 
 import "base/result.proto";
-import "base/request.proto";
 import "base/freespin.proto";
 
 
@@ -16,12 +15,7 @@ message Jackpot {
 }
 
 
-message DragonReelResult {
-  BaseResult res = 1;
+message DragonBonus {
   FreeSpin free = 2;
-    Jackpot jackpot = 3;
-}
-
-service DragonReel {
-  rpc Spin(Request) returns (DragonReelResult);
+  Jackpot jackpot = 3;
 }

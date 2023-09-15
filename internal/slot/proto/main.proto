@@ -1,0 +1,24 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+import "base/request.proto";
+import "base/result.proto";
+
+import "foodie.proto";
+import "dragon.proto";
+
+
+message Response {
+  BaseResult res = 1;
+  string state = 2;
+  oneof bonus {
+    FoodieBonus foodie = 3;
+    DragonBonus dragon = 4;
+  }
+}
+
+
+service Slot {
+  rpc Spin(Request) returns (Response);
+}

@@ -4,15 +4,10 @@ option go_package = "./proto";
 
 
 import "base/result.proto";
-import "base/request.proto";
 import "base/freespin.proto";
 
 
-message FoodieReelsResult {
-  BaseResult res = 1;
-  FreeSpin free = 2;
+message FoodieBonus {
+  FreeSpin free = 1;
 }
 
-service FoodieReels {
-  rpc Spin(Request) returns (FoodieReelsResult);
-}

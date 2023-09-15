@@ -7,7 +7,7 @@ import (
 	//"slot-crawler/api/router"
 )
 
-func InitRouter(r *gin.Engine, manager *slot.Manager) *gin.Engine {
+func InitRouter(r *gin.Engine, manager *slot.Client) *gin.Engine {
 	apiRouter := r.Group("/api")
 	{
 		//authRouter := apiRouter.Group("/auth")

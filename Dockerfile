@@ -5,7 +5,7 @@ WORKDIR /
 
 # Copies everything from your root directory into /app
 ADD ./web ./web
-ADD ./configs ./configs
+ADD parSheet ./configs
 COPY ./slot-server ./
 
 # Tells Docker which network port your container listens on

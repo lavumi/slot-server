@@ -19,8 +19,6 @@ message BaseResult {
  repeated Strip reel = 4;
  repeated sfixed32 dnSymbol = 5;
  repeated AllLineWin lineWins = 6;
- bool collectable = 7;
- string state = 8;
 }
 
 
