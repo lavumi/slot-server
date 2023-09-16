@@ -21,7 +21,7 @@ func (s *Service) Spin(_ context.Context, req *proto.Request) (*proto.Response, 
 		if foodieRes, err := foodie.Spin(req); err != nil {
 			return nil, status.Errorf(codes.Internal, "foodie slot spin error %s", err.Error())
 		} else {
-			return &proto.Response{Response: &proto.Response_Foodie{Foodie: foodieRes}}, nil
+			return foodieRes, nil
 		}
 	default:
 		return nil, status.Errorf(codes.Unimplemented, "method Spin not implemented")

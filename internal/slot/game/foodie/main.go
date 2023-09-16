@@ -13,7 +13,7 @@ var ps ParSheet
 
 func init() {
 
-	_, err := toml.DecodeFile("./parSheet/foodie.toml", &ps)
+	_, err := toml.DecodeFile("../parSheet/foodie.toml", &ps)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,21 +36,21 @@ func Spin(req *proto.Request) (*proto.Response, *model.Error) {
 	downSymbols := []int32{11, 12, 13, 14, 10}
 
 	return &proto.Response{
-		Res: &proto.BaseResult{
-			Win:      float32(totalWin),
-			TotalWin: float32(totalWin),
-			UpSymbol: upSymbols,
-			Reel:     api.GridConvert(grid),
-			DnSymbol: downSymbols,
-			LineWins: api.LinePayConvert(&lineWins),
+		SpinResponse: &proto.SpinResponse{
+			Res: &proto.BaseResult{
+				Win:      float32(totalWin),
+				TotalWin: float32(totalWin),
+				UpSymbol: upSymbols,
+				Reel:     api.GridConvert(grid),
+				DnSymbol: downSymbols,
+				LineWins: api.LinePayConvert(&lineWins),
+			},
+			Bonus: &proto.SpinResponse_Foodie{Foodie: &proto.FoodieBonus{Free: &proto.FreeSpin{
+				Win:    1,
+				Remain: 2,
+				Max:    3,
+			}}},
 		},
-		Bonus: &proto.Response_Foodie{
-			Foodie: &proto.FoodieBonus{Free: &proto.FreeSpin{
-				Win:    0,
-				Remain: 0,
-				Max:    0,
-			}},
-		},
-		State: "",
+		State: "thisistempstate",
 	}, nil
 }

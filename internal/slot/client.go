@@ -1,11 +1,13 @@
 package slot
 
 import (
-	"context"
+	"fmt"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
 	"log"
 	"slot-server/internal/server/model"
 	"slot-server/internal/slot/api/proto"
@@ -22,12 +24,13 @@ func Connect() (*Client, error) {
 		return nil, err
 	}
 
-	c := proto.NewSlotClient(conn).(Client)
-	return &c, nil
+	c := proto.NewSlotClient(conn)
+	return &Client{SlotClient: c}, nil
 }
 
 func (c *Client) RequestSpin(slotId uint32, bet float32, prevState string) (*model.SpinOutput, string, error) {
 	req := &proto.Request{
+		SlotId:    slotId,
 		BetCash:   bet,
 		BetLine:   0,
 		PrevState: prevState,
@@ -36,36 +39,40 @@ func (c *Client) RequestSpin(slotId uint32, bet float32, prevState string) (*mod
 	if spin, err := c.Spin(context.Background(), req); err != nil {
 		return nil, "", err
 	} else {
-
-		spinResponse := spin.GetResponse()
-
-		// Slot1 또는 Slot2에 따라 다른 데이터 출력
-		switch slotData := spinResponse.(type) {
-		case *proto.Response_Foodie:
-				slotData.Foodie.
-		case *proto.Response_Dragon:
-
-		default:
-			return nil, "", status.Errorf(codes.InvalidArgument, "Invalid response type")
-		}
+		// protobuf 메시지를 바이트 슬라이스로 직렬화
+		res, _ := protojson.Marshal(spin.GetSpinResponse())
+		// JSON 문자열 출력
+		fmt.Println(string(res))
+		fmt.Println(spin.GetState())
 	}
+
+	return nil, "", status.Errorf(codes.InvalidArgument, "Invalid response type")
 }
 
-//func (c *Client) Spin(slotId uint32, bet float32, prevState string) (*model.SpinOutput, string, error) {
-//	req := &proto.Request{
-//		BetCash:   bet,
-//		BetLine:   0,
-//		PrevState: prevState,
-//	}
-//
-//	switch slotId {
-//	case 0:
-//		if spin, err := c.Spin(context.Background(), req); err != nil {
-//			return nil, "", err
-//		} else {
-//			return convertSlotResponse(spin), spin.State, nil
-//		}
-//	default:
-//		return nil, "", fmt.Errorf("invalid SlotId %d", slotId)
-//	}
-//}
+func unmarshalProto(baseRes *proto.BaseResult) model.SpinOutput {
+	var reel [][]int32
+	for _, strip := range baseRes.Reel {
+		reel = append(reel, strip.Strip)
+	}
+
+	var lw []*model.AllLineWin
+
+	for _, win := range baseRes.LineWins {
+
+		lw = append(lw, &model.AllLineWin{
+			Win: win.Win,
+			//Position: win.Position,
+		})
+	}
+
+	return model.SpinOutput{
+		Win:         baseRes.Win,
+		TotalWin:    baseRes.TotalWin,
+		Symbols:     reel,
+		UpSymbols:   baseRes.UpSymbol,
+		DownSymbols: baseRes.DnSymbol,
+		LineWins:    lw,
+		BonusWins:   nil,
+		NextProcess: nil,
+	}
+}

@@ -9,13 +9,19 @@ import "foodie.proto";
 import "dragon.proto";
 
 
-message Response {
+message SpinResponse {
   BaseResult res = 1;
-  string state = 2;
   oneof bonus {
-    FoodieBonus foodie = 3;
-    DragonBonus dragon = 4;
+    FoodieBonus foodie = 2;
+    DragonBonus dragon = 3;
   }
+}
+
+
+message Response {
+  SpinResponse spinResponse = 1;
+  string state = 2;
+
 }
 
 

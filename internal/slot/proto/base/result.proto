@@ -4,7 +4,7 @@ option go_package = "./proto";
 
 
 message Strip {
- repeated sfixed32 symbol = 1;
+ repeated sfixed32 strip = 1;
 }
 
 message AllLineWin {

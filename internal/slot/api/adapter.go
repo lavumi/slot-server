@@ -22,7 +22,7 @@ func GridConvert(grid [][]int) []*proto.Strip {
 	var result []*proto.Strip
 
 	for _, s := range grid {
-		strip := proto.Strip{Symbol: convertIntArray[int32](s)}
+		strip := proto.Strip{Strip: convertIntArray[int32](s)}
 		result = append(result, &strip)
 	}
 	return result
@@ -30,10 +30,20 @@ func GridConvert(grid [][]int) []*proto.Strip {
 
 func LinePayConvert(wins *[]model.AllLineWin) []*proto.AllLineWin {
 	var result []*proto.AllLineWin
+
 	for _, w := range *wins {
+
+		var pos []int32
+		for _, strip := range w.Position {
+			var bitmask int32
+			for _, num := range strip {
+				bitmask |= 1 << uint(num)
+			}
+			pos = append(pos, bitmask)
+		}
 		win := proto.AllLineWin{
 			Win:      float32(w.Win),
-			Position: nil,
+			Position: pos,
 		}
 		result = append(result, &win)
 	}

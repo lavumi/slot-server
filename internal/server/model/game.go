@@ -18,17 +18,17 @@ type SpinInput struct {
 }
 
 type AllLineWin struct {
-	Win      float64 `json:"win"`
+	Win      float32 `json:"win"`
 	Position [][]int `json:"pos"`
 }
 
 type SpinOutput struct {
-	Win         float64           `json:"win"`
-	TotalWin    float64           `json:"tw"`
-	Symbols     [][]int           `json:"s"`
-	UpSymbols   []int             `json:"us"`
-	DownSymbols []int             `json:"ds"`
-	LineWins    []AllLineWin      `json:"lp"`
+	Win         float32           `json:"win"`
+	TotalWin    float32           `json:"tw"`
+	Symbols     [][]int32         `json:"s"`
+	UpSymbols   []int32           `json:"us"`
+	DownSymbols []int32           `json:"ds"`
+	LineWins    []*AllLineWin     `json:"lp"`
 	BonusWins   map[string]string `json:"bn,omitempty"`
 	NextProcess interface{}       `json:"next"`
 }
