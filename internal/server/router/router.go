@@ -7,7 +7,7 @@ import (
 	//"slot-crawler/api/router"
 )
 
-func InitRouter(r *gin.Engine, manager *slot.Client) *gin.Engine {
+func InitRouter(r *gin.Engine, slcl *slot.Client) *gin.Engine {
 	apiRouter := r.Group("/api")
 	{
 		//authRouter := apiRouter.Group("/auth")
@@ -18,7 +18,7 @@ func InitRouter(r *gin.Engine, manager *slot.Client) *gin.Engine {
 		gameRouter := apiRouter.Group("/game")
 		{
 			//gameRouter.POST("/:id/enter")
-			gameRouter.POST("/:id/spin", handler.Spin(manager))
+			gameRouter.POST("/:id/spin", handler.Spin(slcl))
 			//gameRouter.POST("/:id/collect")
 			//gameRouter.GET("/:id/info")
 		}

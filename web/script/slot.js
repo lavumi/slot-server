@@ -14,9 +14,17 @@ const winAmountTxt = document.querySelector('.win-amount');
 const payTable = document.querySelector('#pay-table');
 const walletText = document.querySelector('.wallet span');
 const initialData = {
-    us : [11, 12, 13, 14, 10],
-    s :  [[12, 14, 11], [14, 13, 20], [20, 12, 12], [20, 13, 10], [21, 14, 22],],
-    ds : [11, 12, 13, 14, 10]
+    res : {
+        up : [11, 12, 13, 14, 10],
+        reel :[
+            {strip : [12, 14, 11]},
+            {strip : [14, 13, 20]},
+            {strip : [20, 12, 12]},
+            {strip : [20, 13, 10]},
+            {strip : [21, 14, 22]}
+            ],
+        dn : [11, 12, 13, 14, 10]
+    }
 };
 const spinTimeInterval = 100;
 let wallet = 0;
@@ -65,9 +73,11 @@ async function startSpin() {
 }
 
 function changeGrid(spinOutput) {
-    let up = spinOutput.us;
-    let grid = spinOutput.s;
-    let down = spinOutput.ds;
+    let baseRes = spinOutput.res;
+
+    let up = baseRes.up;
+    let grid = baseRes.reel;
+    let down = baseRes.dn;
 
     function changeReel(f, s, e) {
         this[0].innerHTML = symbols[f];
@@ -77,7 +87,7 @@ function changeGrid(spinOutput) {
         this[4].innerHTML = symbols[e];
     }
     for (let i = 0; i < reels.length; i++) {
-        changeReel.call(reels[i], up[i], grid[i], down[i]);
+        changeReel.call(reels[i], up[i], grid[i].strip, down[i]);
     }
     return spinOutput
 }
@@ -101,23 +111,24 @@ async function stopSpin(spinOutput) {
 }
 
 function setSpinResult(res) {
+    console.log(res);
     return res.SpinOutput;
 }
 
 function setWinAmount( spinOutput ){
-    winAmountTxt.innerHTML = `$ ${spinOutput.tw}`;
 
-    updateWallet(spinOutput.tw);
+    let winAmount = spinOutput.res.win ?? 0;
+    winAmountTxt.innerHTML = `$ ${winAmount}`;
+    updateWallet(winAmount);
     return spinOutput;
 }
 
 async function showLineWins(spinOutput){
 
 
-    let linePayList = spinOutput.lp;
-    if (linePayList === null )return;
+    let linePayList = spinOutput.res.lineWins;
+    if (!!linePayList === false ) return;
     loopingLinePay = true;
-
     async function linePay( winLines ){
 
         for (let i = 0; i < reels.length; i++) {
@@ -140,7 +151,7 @@ async function showLineWins(spinOutput){
     for (let i = 0; loopingLinePay === true; i++) {
         if ( i === linePayList.length )
             i = 0;
-        await linePay(linePayList[i].pos);
+        await linePay(linePayList[i].position);
     }
 }
 

@@ -22,9 +22,12 @@ func Run() {
 
 	initialize()
 
-	//여기를 어떻게 예쁘게 할지 고민이 좀 필요합니다.
-	m := slot.Initialize()
-	router.InitRouter(r, m)
+	slotClient, err := slot.Connect()
+	if err != nil {
+		panic("login to slot server fail")
+	}
+
+	router.InitRouter(r, slotClient)
 
 	run()
 }

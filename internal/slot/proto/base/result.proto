@@ -15,9 +15,9 @@ message AllLineWin {
 message BaseResult {
  float win = 1;
  float totalWin = 2;
- repeated sfixed32 upSymbol = 3;
+ repeated sfixed32 up = 3;
  repeated Strip reel = 4;
- repeated sfixed32 dnSymbol = 5;
+ repeated sfixed32 dn = 5;
  repeated AllLineWin lineWins = 6;
 }
 
