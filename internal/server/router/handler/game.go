@@ -19,7 +19,7 @@ func Spin(slot *slot.Client) gin.HandlerFunc {
 			return
 		}
 
-		spin, state, err := slot.RequestSpin(0, req.BetCash, "")
+		spin, state, err := slot.RequestSpin(0, req.BetCash, nil)
 		if err != nil {
 			SendError(c, 400, err.Error())
 			return

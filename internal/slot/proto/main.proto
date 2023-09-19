@@ -8,8 +8,7 @@ import "base/result.proto";
 import "foodie.proto";
 import "dragon.proto";
 
-
-message SpinResponse {
+message SpinResult {
   BaseResult res = 1;
   oneof bonus {
     FoodieBonus foodie = 2;
@@ -17,14 +16,16 @@ message SpinResponse {
   }
 }
 
-
-message Response {
-  SpinResponse spinResponse = 1;
+message SpinResponse {
+  SpinResult result = 1;
   string state = 2;
-
 }
 
+message EnterResponse {
+  repeated float BetTable = 1;
+}
 
 service Slot {
-  rpc Spin(Request) returns (Response);
+  rpc Enter(Request) returns (EnterResponse);
+  rpc Spin(Request) returns (SpinResponse);
 }

@@ -6,11 +6,7 @@ import (
 
 type state struct {
 	module.State
-	RemainFreeSpin int
-	TotalFreeSpin  int
-	FreeSpinWin    float64
-}
-
-type Bonus struct {
-	FreeSpin string `json:"freeSpin,omitempty"`
+	RemainFreeSpin uint32
+	TotalFreeSpin  uint32
+	FreeSpinWin    float32
 }

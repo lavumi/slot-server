@@ -12,6 +12,13 @@ message AllLineWin {
  repeated sfixed32 position = 2;
 }
 
+message ScatterWin {
+ float win = 1;
+ repeated sfixed32 position = 2;
+ sfixed32 bonus = 3;
+ float bonusParam = 4;
+}
+
 message BaseResult {
  float win = 1;
  float totalWin = 2;
@@ -19,6 +26,7 @@ message BaseResult {
  repeated Strip reel = 4;
  repeated sfixed32 dn = 5;
  repeated AllLineWin lineWins = 6;
+ repeated ScatterWin scatterWins = 7;
 }
 
 

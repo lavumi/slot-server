@@ -15,7 +15,7 @@ type Service struct {
 	proto.UnimplementedSlotServer
 }
 
-func (s *Service) Spin(_ context.Context, req *proto.Request) (*proto.Response, error) {
+func (s *Service) Spin(_ context.Context, req *proto.Request) (*proto.SpinResponse, error) {
 	switch req.GetSlotId() {
 	case 0:
 		if foodieRes, err := foodie.Spin(req); err != nil {

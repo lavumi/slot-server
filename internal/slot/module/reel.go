@@ -2,6 +2,7 @@ package module
 
 import (
 	"fmt"
+	"slot-server/internal/slot/api/proto"
 	"slot-server/internal/slot/model"
 )
 
@@ -31,11 +32,6 @@ func (s *Strip) getSymbolStripByIndex(start int, count int) []int {
 
 	}
 	return strip
-}
-
-type Pay struct {
-	Symbol int       `toml:"symbol,omitempty"`
-	Payout []float64 `toml:"payout,omitempty"`
 }
 
 // GenRandomGrid Make Spin Result
@@ -72,67 +68,65 @@ func makeGrid(strip []Strip, column int, randoms []int) [][]int {
 }
 
 // LineWins Calculate LinePay for NormalLinePay Slot
-func _(grid [][]int, lines [][]int, pays []Pay, bet float64) []model.LineWin {
-	var wins []model.LineWin
-	for _, pay := range pays {
-		for _, line := range lines {
-			lineToCheck := getLine(grid, line)
-			matched := getWinsByLine(lineToCheck, pay.Symbol)
-			if matched > 2 {
-				win := model.LineWin{
-					Win:      pay.Payout[matched-1] * bet,
-					Position: line[0:matched],
-				}
-				wins = append(wins, win)
-			}
-		}
-	}
-	return wins
-}
-func getLine(grid [][]int, line []int) []int {
-	lineToCheck := make([]int, len(line))
-	for i, pos := range line {
-		lineToCheck[i] = grid[i][pos]
-	}
-	return lineToCheck
-}
-func getWinsByLine(line []int, symbol int) int {
-	for i, s := range line {
-		if s != symbol {
-			return i
-		}
-	}
-	return len(line)
-}
+//func _(grid [][]int, lines [][]int, pays []Line, bet float32) []model.LineWin {
+//	var wins []model.LineWin
+//	for _, pay := range pays {
+//		for _, line := range lines {
+//			lineToCheck := getLine(grid, line)
+//			matched := getWinsByLine(lineToCheck, pay.Symbol)
+//			if matched > 2 {
+//				win := model.LineWin{
+//					Win:      pay.Payout[matched-1] * bet,
+//					Position: line[0:matched],
+//				}
+//				wins = append(wins, win)
+//			}
+//		}
+//	}
+//	return wins
+//}
+//func getLine(grid [][]int, line []int) []int {
+//	lineToCheck := make([]int, len(line))
+//	for i, pos := range line {
+//		lineToCheck[i] = grid[i][pos]
+//	}
+//	return lineToCheck
+//}
+//func getWinsByLine(line []int, symbol int) int {
+//	for i, s := range line {
+//		if s != symbol {
+//			return i
+//		}
+//	}
+//	return len(line)
+//}
 
-func AllLineWins(grid [][]int, pays []Pay, bet float64) []model.AllLineWin {
-	var wins []model.AllLineWin
+func AllLineWins(grid [][]int, pays []model.Line, bet float32) []*proto.AllLineWin {
+	var wins []*proto.AllLineWin
 
 	for _, initSymbol := range grid[0] {
-		var matchedGrid [][]int
+		var winPos []int32
+		var matchedCount int32 = 1
 		for i := 0; i < len(grid); i++ {
-			matchedIndex := findSymbol(grid[i], initSymbol, i > 0)
-			if len(matchedIndex) > 0 {
-				matchedGrid = append(matchedGrid, matchedIndex)
+			bitmask, count := findSymbol(grid[i], initSymbol, i > 0)
+			if count > 0 {
+				winPos = append(winPos, bitmask)
+				matchedCount *= count
 			} else {
 				break
 			}
 		}
 
-		winCount := len(matchedGrid)
+		winCount := len(winPos)
 		if winCount > 2 {
-			matchedCount := 1
-			for _, match := range matchedGrid {
-				matchedCount *= len(match)
-			}
-
 			for _, pay := range pays {
 				if pay.Symbol == initSymbol {
-					win := model.AllLineWin{
-						Win:      pay.Payout[winCount-1] * float64(matchedCount) * bet,
-						Position: matchedGrid,
+					winCash := pay.Payout[winCount-1] * float32(matchedCount) * bet
+					win := proto.AllLineWin{
+						Win:      winCash,
+						Position: winPos,
 					}
-					wins = append(wins, win)
+					wins = append(wins, &win)
 				}
 			}
 
@@ -141,12 +135,46 @@ func AllLineWins(grid [][]int, pays []Pay, bet float64) []model.AllLineWin {
 
 	return wins
 }
-func findSymbol(strip []int, symbolToFind int, checkWild bool) []int {
-	var matchIndex []int
+func findSymbol(strip []int, symbolToFind int, checkWild bool) (int32, int32) {
+	var bitmask int32
+	var count int32 = 0
 	for i, symbol := range strip {
 		if symbol == symbolToFind || (checkWild && symbol == WildSymbol) {
-			matchIndex = append(matchIndex, i)
+			bitmask |= 1 << uint(i)
+			count++
 		}
 	}
-	return matchIndex
+	return bitmask, count
+}
+
+func ScatterWin(grid [][]int, scatter model.Scatter, totalBet float32) *proto.ScatterWin {
+
+	symbolToFind := scatter.Symbol
+	var winPos []int32
+	var matchedCount int32 = 0
+	for i := 0; i < len(grid); i++ {
+		bitmask, count := findSymbol(grid[i], symbolToFind, false)
+		winPos = append(winPos, bitmask)
+		matchedCount += count
+	}
+
+	if matchedCount == 0 {
+		return nil
+	}
+
+	winCash := scatter.Payout[matchedCount-1] * totalBet
+	bonusParam := scatter.Bonus[matchedCount-1]
+
+	win := proto.ScatterWin{
+		Win:        winCash,
+		Position:   winPos,
+		Bonus:      int32(scatter.BonusType),
+		BonusParam: float32(bonusParam),
+	}
+
+	if winCash == 0 && bonusParam == 0 {
+		return nil
+	}
+
+	return &win
 }

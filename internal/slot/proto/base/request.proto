@@ -7,5 +7,5 @@ message Request {
   uint32 SlotId = 1;
   float BetCash = 2;
   uint32 BetLine = 3;
-  string PrevState =4;
+  bytes PrevState =4;
 }

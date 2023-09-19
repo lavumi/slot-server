@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SlotClient interface {
-	Spin(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	Enter(ctx context.Context, in *Request, opts ...grpc.CallOption) (*EnterResponse, error)
+	Spin(ctx context.Context, in *Request, opts ...grpc.CallOption) (*SpinResponse, error)
 }
 
 type slotClient struct {
@@ -33,8 +34,17 @@ func NewSlotClient(cc grpc.ClientConnInterface) SlotClient {
 	return &slotClient{cc}
 }
 
-func (c *slotClient) Spin(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
+func (c *slotClient) Enter(ctx context.Context, in *Request, opts ...grpc.CallOption) (*EnterResponse, error) {
+	out := new(EnterResponse)
+	err := c.cc.Invoke(ctx, "/slot.Slot/Enter", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *slotClient) Spin(ctx context.Context, in *Request, opts ...grpc.CallOption) (*SpinResponse, error) {
+	out := new(SpinResponse)
 	err := c.cc.Invoke(ctx, "/slot.Slot/Spin", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -46,7 +56,8 @@ func (c *slotClient) Spin(ctx context.Context, in *Request, opts ...grpc.CallOpt
 // All implementations must embed UnimplementedSlotServer
 // for forward compatibility
 type SlotServer interface {
-	Spin(context.Context, *Request) (*Response, error)
+	Enter(context.Context, *Request) (*EnterResponse, error)
+	Spin(context.Context, *Request) (*SpinResponse, error)
 	mustEmbedUnimplementedSlotServer()
 }
 
@@ -54,7 +65,10 @@ type SlotServer interface {
 type UnimplementedSlotServer struct {
 }
 
-func (UnimplementedSlotServer) Spin(context.Context, *Request) (*Response, error) {
+func (UnimplementedSlotServer) Enter(context.Context, *Request) (*EnterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Enter not implemented")
+}
+func (UnimplementedSlotServer) Spin(context.Context, *Request) (*SpinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Spin not implemented")
 }
 func (UnimplementedSlotServer) mustEmbedUnimplementedSlotServer() {}
@@ -68,6 +82,24 @@ type UnsafeSlotServer interface {
 
 func RegisterSlotServer(s grpc.ServiceRegistrar, srv SlotServer) {
 	s.RegisterService(&Slot_ServiceDesc, srv)
+}
+
+func _Slot_Enter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SlotServer).Enter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/slot.Slot/Enter",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SlotServer).Enter(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Slot_Spin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -95,6 +127,10 @@ var Slot_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "slot.Slot",
 	HandlerType: (*SlotServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Enter",
+			Handler:    _Slot_Enter_Handler,
+		},
 		{
 			MethodName: "Spin",
 			Handler:    _Slot_Spin_Handler,

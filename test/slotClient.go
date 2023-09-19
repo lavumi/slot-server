@@ -1,6 +1,9 @@
 package main
 
-import "slot-server/internal/slot"
+import (
+	"fmt"
+	"slot-server/internal/slot"
+)
 
 func main() {
 	connect, err := slot.Connect()
@@ -8,9 +11,11 @@ func main() {
 		return
 	}
 
-	_, _, err = connect.RequestSpin(0, 1.0, "")
+	spin, state, err := connect.RequestSpin(0, 1.0, nil)
 	if err != nil {
 		return
 	}
 
+	fmt.Println(string(spin))
+	fmt.Println(state)
 }

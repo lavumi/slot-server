@@ -26,7 +26,7 @@ func Connect() (*Client, error) {
 	return &Client{SlotClient: c}, nil
 }
 
-func (c *Client) RequestSpin(slotId uint32, bet float32, prevState string) ([]byte, string, error) {
+func (c *Client) RequestSpin(slotId uint32, bet float32, prevState []byte) ([]byte, string, error) {
 	req := &proto.Request{
 		SlotId:    slotId,
 		BetCash:   bet,
@@ -36,7 +36,7 @@ func (c *Client) RequestSpin(slotId uint32, bet float32, prevState string) ([]by
 
 	if spin, err := c.Spin(context.Background(), req); err != nil {
 		return nil, "", status.Errorf(codes.Internal, "Error on spin %s", err.Error())
-	} else if res, err := protojson.Marshal(spin.GetSpinResponse()); err != nil {
+	} else if res, err := protojson.Marshal(spin.GetResult()); err != nil {
 		return nil, "", status.Errorf(codes.DataLoss, "Marshal Spin response failed %s", err.Error())
 	} else {
 		return res, spin.GetState(), nil

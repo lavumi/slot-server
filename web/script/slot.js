@@ -13,19 +13,6 @@ const spinButton = document.querySelector('.spin-btn');
 const winAmountTxt = document.querySelector('.win-amount');
 const payTable = document.querySelector('#pay-table');
 const walletText = document.querySelector('.wallet span');
-const initialData = {
-    res : {
-        up : [11, 12, 13, 14, 10],
-        reel :[
-            {strip : [12, 14, 11]},
-            {strip : [14, 13, 20]},
-            {strip : [20, 12, 12]},
-            {strip : [20, 13, 10]},
-            {strip : [21, 14, 22]}
-            ],
-        dn : [11, 12, 13, 14, 10]
-    }
-};
 const spinTimeInterval = 100;
 let wallet = 0;
 
@@ -124,17 +111,17 @@ function setWinAmount( spinOutput ){
 }
 
 async function showLineWins(spinOutput){
-
-
     let linePayList = spinOutput.res.lineWins;
+    console.log(linePayList);
     if (!!linePayList === false ) return;
     loopingLinePay = true;
     async function linePay( winLines ){
-
         for (let i = 0; i < reels.length; i++) {
             if (winLines[i] !== undefined){
-                for (let j = 0; j < winLines[i].length; j++) {
-                    reels[i][winLines[i][j]+1].style.animation = 'highlight 0.6s ease infinite';
+                let bit = ConvertToBitArray( winLines[i]);//.toString(2);
+                for (let j = 0; j < bit.length; j++) {
+                    if ( bit[j] === 1)
+                        reels[i][j+1].style.animation = 'highlight 0.6s ease infinite';
                 }
             }
         }
@@ -148,11 +135,13 @@ async function showLineWins(spinOutput){
         }
         await waitSec(100);
     }
-    for (let i = 0; loopingLinePay === true; i++) {
-        if ( i === linePayList.length )
-            i = 0;
-        await linePay(linePayList[i].position);
-    }
+
+
+    // for (let i = 0; loopingLinePay === true; i++) {
+    //     if ( i === linePayList.length )
+    //         i = 0;
+        await linePay(linePayList[0].position);
+    // }
 }
 
 function stopLineWinAnimation(){
@@ -184,7 +173,8 @@ function initPayTable(slotConfig){
             }
         }
     }
-    return initialData
+
+    return slotConfig.initialData
 }
 
 //region
@@ -206,3 +196,15 @@ function InitSlotUI() {
 }
 InitSlotUI();
 
+
+
+
+function ConvertToBitArray(intNumber) {
+    const bitArray = [];
+
+    let bitString = intNumber.toString(2);
+    for (let i =bitString.length -1; i >=0 ; i--) {
+         bitArray.push( parseInt(bitString[i]));
+    }
+    return bitArray;
+}
