@@ -139,7 +139,7 @@ func findSymbol(strip []int, symbolToFind int, checkWild bool) (int32, int32) {
 	var bitmask int32
 	var count int32 = 0
 	for i, symbol := range strip {
-		if symbol == symbolToFind || (checkWild && symbol == WildSymbol) {
+		if symbol == symbolToFind || (checkWild && symbol == model.WildSymbol) {
 			bitmask |= 1 << uint(i)
 			count++
 		}

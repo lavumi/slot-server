@@ -3,12 +3,13 @@ package server
 import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"slot-server/internal/database"
+	"slot-server/internal/db"
 	"slot-server/internal/server/router"
 	"slot-server/internal/slot"
 	"syscall"
@@ -19,6 +20,11 @@ var r *gin.Engine
 var srv *http.Server
 
 func Run() {
+
+	err := godotenv.Load(".web.dev.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	initialize()
 
@@ -78,7 +84,7 @@ func run() {
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
-		database.DisConnect()
+		db.DisConnect()
 		log.Println("timeout of 5 seconds.")
 	}
 	log.Println("server exiting")

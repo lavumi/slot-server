@@ -1,5 +1,9 @@
 package model
 
+const (
+	WildSymbol int = 99
+)
+
 type Bonus int32
 
 const (

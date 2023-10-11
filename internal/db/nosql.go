@@ -1,4 +1,4 @@
-package slot
+package db
 
 import (
 	"fmt"
@@ -10,25 +10,25 @@ import (
 	"os"
 )
 
-type Database struct {
-	client *mongo.Client
-	log    *mongo.Collection
-	state  *mongo.Collection
-}
+//const uri = "mongodb+srv://lavumi:<password>@cluster0.kuovpbb.mongodb.net/?retryWrites=true&w=majority"
 
-func Initialize() *Database {
+type MongoDb struct{}
+
+var client *mongo.Client
+
+func Initialize() {
+
 	cluster := os.Getenv("CLUSTER")
-	username := os.Getenv("SLOT_DB_USER")
-	password := os.Getenv("SLOT_DB_PASS")
-	db := os.Getenv("SLOT_DB_NAME")
+	username := os.Getenv("USER")
+	password := os.Getenv("PASS")
 
 	uri := "mongodb://" + url.QueryEscape(username) + ":" +
 		url.QueryEscape(password) + "@" + cluster +
 		"/admin"
 
 	fmt.Println(uri)
-	//var err error
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	var err error
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
 	}
@@ -39,14 +39,10 @@ func Initialize() *Database {
 	}
 	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
 
-	logCol := client.Database(db).Collection("log")
-	stateCol := client.Database("slot_data_2").Collection("spin")
+}
 
-	slotDb := Database{
-		client: client,
-		log:    logCol,
-		state:  stateCol,
+func DisConnect() {
+	if err := client.Disconnect(context.TODO()); err != nil {
+		panic(err)
 	}
-
-	return &slotDb
 }

@@ -26,18 +26,24 @@ spinButton.addEventListener('click', () => {
     }
 });
 
-function waitSec(time) {
-    return new Promise(
-        (resolve) => setTimeout(resolve, time)
-    )
+
+function InitSlotUI() {
+    updateWallet(1000000);
+    Network
+        .Load()
+        .then(res => {
+            symbols = res.symbols;
+            return res;
+        })
+        .then(initPayTable)
+        .then(changeGrid)
 }
 function requestSpin() {
     loopingLinePay = false;
     updateWallet(-1.0 * 25);
     stopLineWinAnimation();
-    startSpin()
+    SpinReels()
         .then(() => {
-
         return Network.Spin(0, 1.0, 25)
     })
         .then(setSpinResult)
@@ -46,8 +52,29 @@ function requestSpin() {
         .then(setWinAmount)
         .then(showLineWins)
 }
+
+
 //region [ UI ]
-async function startSpin() {
+
+function initPayTable(slotConfig){
+    let payouts = slotConfig.payout;
+
+    for (const symbolId in payouts) {
+        let symbol = symbols[symbolId];
+        for (let i = 0; i < payouts[symbolId].length; i++) {
+            if ( payouts[symbolId][i] > 0 ){
+                for (let j = 0; j < i+1; j++) {
+                    payTable.innerHTML += symbol;
+                }
+                payTable.innerHTML += `&nbsp x ${payouts[symbolId][i]}<br>`;
+            }
+        }
+    }
+
+    return slotConfig.initialData
+}
+
+async function SpinReels() {
     function _spinReel() {
         for (let i = 0; i < this.length; i++) {
             this[i].style.animation = 'moveSlots 0.1s linear infinite';
@@ -99,7 +126,7 @@ async function stopSpin(spinOutput) {
 
 function setSpinResult(res) {
     console.log(res);
-    return res.SpinOutput;
+    return res;
 }
 
 function setWinAmount( spinOutput ){
@@ -159,45 +186,15 @@ function updateWallet(amount){
     walletText.innerHTML = `$ ${wallet.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 
-function initPayTable(slotConfig){
-    let payouts = slotConfig.payout;
 
-    for (const symbolId in payouts) {
-        let symbol = symbols[symbolId];
-        for (let i = 0; i < payouts[symbolId].length; i++) {
-            if ( payouts[symbolId][i] > 0 ){
-                for (let j = 0; j < i+1; j++) {
-                    payTable.innerHTML += symbol;
-                }
-                payTable.innerHTML += `&nbsp x ${payouts[symbolId][i]}<br>`;
-            }
-        }
-    }
 
-    return slotConfig.initialData
+
+//region [ UTIL ]
+function waitSec(time) {
+    return new Promise(
+        (resolve) => setTimeout(resolve, time)
+    )
 }
-
-//region
-
-//
-
-
-
-function InitSlotUI() {
-    updateWallet(1000000);
-    Network
-        .Load()
-        .then(res => {
-            symbols = res.symbols;
-            return res;
-        })
-        .then(initPayTable)
-        .then(changeGrid)
-}
-InitSlotUI();
-
-
-
 
 function ConvertToBitArray(intNumber) {
     const bitArray = [];
@@ -208,3 +205,12 @@ function ConvertToBitArray(intNumber) {
     }
     return bitArray;
 }
+
+//endregion
+
+
+
+
+
+
+InitSlotUI();

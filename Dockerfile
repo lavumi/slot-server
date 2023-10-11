@@ -11,7 +11,6 @@ COPY ./slot-server ./
 # Tells Docker which network port your container listens on
 EXPOSE 8081
 
-
 RUN apk add --no-cache bash
 # Specifies the executable command that runs when the container starts
 CMD [ "/slot-server" ]

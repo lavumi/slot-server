@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 	"slot-server/internal/server/model"
 	"slot-server/internal/slot"
 )
@@ -15,13 +16,14 @@ func Spin(slot *slot.Client) gin.HandlerFunc {
 		if err := c.ShouldBindJSON(&req); err != nil {
 			//c.JSON(400, gin.H{"msg": err})
 			fmt.Println(err.Error())
-			SendError(c, 400, err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+			//SendError(c, 400, err.Error())
 			return
 		}
 
 		spin, state, err := slot.RequestSpin(0, req.BetCash, nil)
 		if err != nil {
-			SendError(c, 400, err.Error())
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -30,16 +32,10 @@ func Spin(slot *slot.Client) gin.HandlerFunc {
 		spinObject := make(map[string]interface{})
 		err = json.Unmarshal(spin, &spinObject)
 		if err != nil {
-			SendError(c, 400, err.Error())
+			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		c.JSON(200, gin.H{
-			"BaseResponse": model.BaseResponse{
-				Code:    200,
-				Message: "success",
-			},
-			"SpinOutput": spinObject,
-		})
+		c.JSON(http.StatusOK, spinObject)
 	}
 }
