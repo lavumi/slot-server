@@ -212,5 +212,11 @@ function ConvertToBitArray(intNumber) {
 
 
 
+( async ()=>{
+    await Network.Guest()
+        .then(console.log);
+})();
+
+
 
 InitSlotUI();

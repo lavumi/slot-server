@@ -1,4 +1,4 @@
-package model
+package models
 
 type BaseRequest struct {
 	Index   int `json:"index"`

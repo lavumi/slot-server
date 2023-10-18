@@ -1,7 +1,9 @@
-package model
+package forms
+
+import "slot-server/internal/server/models"
 
 type SpinRequest struct {
-	BaseRequest
+	models.BaseRequest
 	SpinInput
 }
 

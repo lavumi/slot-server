@@ -7,20 +7,35 @@ import (
 
 type PseudoRedis struct{}
 
-var pRedis PseudoRedis
-var storage map[string]string
+var pRedis = PseudoRedis{}
+var storage map[string]struct {
+	Value      string
+	ExpiryTime time.Time
+}
 
 type PseudoGetResult struct {
 	key string
 }
 
+func init() {
+	storage = make(map[string]struct {
+		Value      string
+		ExpiryTime time.Time
+	})
+}
+
 func (pr *PseudoGetResult) Result() (string, error) {
 
-	value, exist := storage[pr.key]
-	if exist == false {
+	data, exists := storage[pr.key]
+	if !exists {
 		return "", fmt.Errorf("key %s not found", pr.key)
 	}
-	return value, nil
+	if time.Now().After(data.ExpiryTime) {
+		delete(storage, pr.key)
+		return "", fmt.Errorf("data expired")
+	}
+	return data.Value, nil
+
 }
 
 func (p *PseudoRedis) Get(key string) *PseudoGetResult {
@@ -34,8 +49,14 @@ func (pr *PseudoSetResult) Err() error {
 	return nil
 }
 
-func (p *PseudoRedis) Set(key string, value string, time time.Duration) *PseudoSetResult {
-	storage[key] = value
+func (p *PseudoRedis) Set(key string, value string, expiration time.Duration) *PseudoSetResult {
+	storage[key] = struct {
+		Value      string
+		ExpiryTime time.Time
+	}{
+		Value:      value,
+		ExpiryTime: time.Now().Add(expiration),
+	}
 	return &PseudoSetResult{}
 }
 

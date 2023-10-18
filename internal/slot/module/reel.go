@@ -68,14 +68,14 @@ func makeGrid(strip []Strip, column int, randoms []int) [][]int {
 }
 
 // LineWins Calculate LinePay for NormalLinePay Slot
-//func _(grid [][]int, lines [][]int, pays []Line, bet float32) []model.LineWin {
-//	var wins []model.LineWin
+//func _(grid [][]int, lines [][]int, pays []Line, bet float32) []models.LineWin {
+//	var wins []models.LineWin
 //	for _, pay := range pays {
 //		for _, line := range lines {
 //			lineToCheck := getLine(grid, line)
 //			matched := getWinsByLine(lineToCheck, pay.Symbol)
 //			if matched > 2 {
-//				win := model.LineWin{
+//				win := models.LineWin{
 //					Win:      pay.Payout[matched-1] * bet,
 //					Position: line[0:matched],
 //				}

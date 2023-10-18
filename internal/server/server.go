@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"slot-server/internal/db"
-	"slot-server/internal/server/router"
+	"slot-server/internal/server/controllers"
+	"slot-server/internal/server/middleware"
 	"slot-server/internal/slot"
 	"syscall"
 	"time"
@@ -19,6 +19,46 @@ import (
 var r *gin.Engine
 var srv *http.Server
 
+func initGin() {
+	r = gin.New()
+	r.ForwardedByClientIP = true
+	err := r.SetTrustedProxies([]string{"127.0.0.1"})
+	if err != nil {
+		panic("set trusted proxies fail")
+	}
+
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+	r.Use(static.Serve("/", static.LocalFile("./web", false)))
+
+	slotClient, err := slot.Connect()
+	if err != nil {
+		panic("login to gameController server fail")
+	}
+
+	authController := controllers.Auth{}
+	gameController := controllers.Game{
+		Slot: slotClient,
+	}
+
+	apiRouter := r.Group("/api")
+	{
+		authRouter := apiRouter.Group("/auth")
+		{
+			authRouter.POST("/guest", authController.Guest)
+		}
+		gameRouter := apiRouter.Group("/game")
+		gameRouter.Use(middleware.SessionHandler)
+		{
+
+			gameRouter.POST("/:id/enter")
+			gameRouter.POST("/:id/spin", gameController.Spin)
+			gameRouter.POST("/:id/collect")
+			gameRouter.GET("/:id/info")
+		}
+	}
+}
+
 func Run() {
 
 	err := godotenv.Load(".web.dev.env")
@@ -26,34 +66,8 @@ func Run() {
 		log.Fatal("Error loading .env file")
 	}
 
-	initialize()
+	initGin()
 
-	slotClient, err := slot.Connect()
-	if err != nil {
-		panic("login to slot server fail")
-	}
-
-	router.InitRouter(r, slotClient)
-
-	run()
-}
-
-func initialize() {
-	//gin.SetMode(gin.ReleaseMode)
-	r = gin.New()
-	r.ForwardedByClientIP = true
-	err := r.SetTrustedProxies([]string{"127.0.0.1"})
-	if err != nil {
-		log.Panic("set trusted proxies fail")
-		return
-	}
-
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
-	r.Use(static.Serve("/", static.LocalFile("./web", false)))
-}
-
-func run() {
 	srv = &http.Server{
 		Addr:        ":8081",
 		Handler:     r,
@@ -61,14 +75,16 @@ func run() {
 		//WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	err := srv.ListenAndServe()
+
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Panic(err.Error())
 		return
 	}
-	// Wait for interrupt signal to gracefully shut down the srv with
-	// a timeout of 5 seconds.
+
+	//region [ Gracefully Shutdown ]
 	quit := make(chan os.Signal)
+
 	// kill (no param) default send syscanll.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall. SIGKILL but can"t be caught, so don't need added it
@@ -84,8 +100,9 @@ func run() {
 	// catching ctx.Done(). timeout of 5 seconds.
 	select {
 	case <-ctx.Done():
-		db.DisConnect()
+		//db.DisConnect()
 		log.Println("timeout of 5 seconds.")
 	}
 	log.Println("server exiting")
+	//endregion
 }

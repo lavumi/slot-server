@@ -1,17 +1,25 @@
 'use strict'
 
 
-let header = new Headers({
-    'Authorization': 'Bearer ' + "mytoken",
-    'uid': 123
-});
+let header = new Headers();
 
-function _login(userid) {
-    header = new Headers({
-        'Authorization': 'Bearer ' + "mytoken",
-        'uid': userid
-    });
+async function _guest() {
+    return await fetch(
+        `/api/auth/guest`,
+        {
+            method: "POST",
+        })
+        .then(res => res.json())
+        .then(resGuest =>{
+           if( resGuest["Key"] ){
+               header.set("Session-Key" , resGuest["Key"]);
+           }
+
+           return resGuest
+        })
 }
+
+
 
 async function _loadSheet(){
     return await fetch(`/config/0.json`)
@@ -26,21 +34,19 @@ async function _spin(slotId, bet, line) {
         bet: bet,
         line: line
     });
-    console.log(body);
     return await fetch(
         `/api/game/${slotId}/spin`,
         {
             method: "POST",
-            // headers: header,
+            headers: header,
             body:body
         })
         .then(res => res.json())
 }
 
 
-
-
 let Network = {
     Spin : _spin,
-    Load : _loadSheet
+    Load : _loadSheet,
+    Guest : _guest
 }
