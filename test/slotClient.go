@@ -11,11 +11,12 @@ func main() {
 		return
 	}
 
-	spin, state, err := connect.RequestSpin(0, 1.0, nil)
+	spin, state, cash, err := connect.RequestSpin(0, 1.0, nil)
 	if err != nil {
 		return
 	}
 
 	fmt.Println(string(spin))
-	fmt.Println(state)
+	fmt.Println(string(state))
+	fmt.Println(cash)
 }

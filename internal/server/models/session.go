@@ -13,6 +13,14 @@ type Session struct {
 	UpdateTime string `json:"update-time"`
 }
 
+type SessionModel struct {
+	r *db.PseudoRedis
+}
+
+func (m *SessionModel) Initialize() {
+	m.r = db.GetRedis()
+}
+
 func UpsertSession(key uuid.UUID, user User) error {
 	session := Session{
 		user,

@@ -1,6 +1,6 @@
 package configs
 
-var InitCash int64
+var InitCash float32
 
 func init() {
 	InitCash = 10000000

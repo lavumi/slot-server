@@ -18,7 +18,8 @@ message SpinResult {
 
 message SpinResponse {
   SpinResult result = 1;
-  string state = 2;
+  bytes state = 2;
+  float cash = 3;
 }
 
 message EnterResponse {

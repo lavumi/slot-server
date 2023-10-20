@@ -9,23 +9,12 @@ import (
 	"net/url"
 )
 
-//const uri = "mongodb+srv://lavumi:<password>@cluster0.kuovpbb.mongodb.net/?retryWrites=true&w=majority"
-
 type MongoDb struct {
-	//Cluster  string
-	//Username string
-	//password string
 	client   *mongo.Client
 	database *mongo.Database
 }
 
-//var client *mongo.Client
-
 func (m *MongoDb) Initialize(cluster string, username string, password string) {
-
-	//cluster := os.Getenv("CLUSTER")
-	//username := os.Getenv("USER")
-	//password := os.Getenv("PASS")
 
 	uri := "mongodb://" + url.QueryEscape(username) + ":" +
 		url.QueryEscape(password) + "@" + cluster +
@@ -33,7 +22,9 @@ func (m *MongoDb) Initialize(cluster string, username string, password string) {
 
 	fmt.Println(uri)
 	var err error
+
 	m.client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+
 	if err != nil {
 		panic(err)
 	}

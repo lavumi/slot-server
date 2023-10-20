@@ -28,13 +28,14 @@ func (g *Game) Spin(c *gin.Context) {
 
 	log.Printf("UserID : %s ", uid)
 
-	spin, state, err := g.Slot.RequestSpin(0, req.BetCash, nil)
+	spin, state, cash, err := g.Slot.RequestSpin(0, req.BetCash, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	log.Printf("spinState : %s\n", state)
+	log.Printf("spinState : %s\n", string(state))
+	log.Printf("spinState : %f\n", cash)
 
 	spinObject := make(map[string]interface{})
 	err = json.Unmarshal(spin, &spinObject)

@@ -26,13 +26,12 @@ async function _loadSheet(){
         .then(res => res.json())
 }
 
-async function _spin(slotId, bet, line) {
+async function _spin(slotId, bet) {
 
     let body = JSON.stringify({
         index: 1,
         counter: 1,
-        bet: bet,
-        line: line
+        bet: bet
     });
     return await fetch(
         `/api/game/${slotId}/spin`,

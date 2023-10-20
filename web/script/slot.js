@@ -39,12 +39,14 @@ function InitSlotUI() {
         .then(changeGrid)
 }
 function requestSpin() {
+    let bet = 1.0;
+    let line = 50;
     loopingLinePay = false;
-    updateWallet(-1.0 * 25);
+    updateWallet(-bet * line);
     stopLineWinAnimation();
     SpinReels()
         .then(() => {
-        return Network.Spin(0, 1.0, 25)
+        return Network.Spin(0, bet)
     })
         .then(setSpinResult)
         .then(changeGrid)

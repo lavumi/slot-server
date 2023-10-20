@@ -54,11 +54,20 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 		totalWin = winCash
 	} else {
 		s.FreeSpinWin += winCash
+		s.RemainFreeSpin--
 	}
 
 	if freeSpinWin != nil {
 		s.RemainFreeSpin += uint32(freeSpinWin.BonusParam)
 		s.TotalFreeSpin += uint32(freeSpinWin.BonusParam)
+	}
+
+	currentState, err := json.Marshal(s)
+	if err != nil {
+		return nil, &model.Error{
+			Code:    model.ERR_UNKNOWN,
+			Message: "FailToParseStateData",
+		}
 	}
 
 	return &proto.SpinResponse{
@@ -79,6 +88,7 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 				},
 			}},
 		},
-		State: "thisistempstate",
+		State: currentState,
+		Cash:  winCash - req.BetCash*50,
 	}, nil
 }
