@@ -28,8 +28,9 @@ func (a *Auth) Guest(c *gin.Context) {
 	}
 
 	res := forms.ResGuest{
-		Key: sessionKey.String(),
-		Id:  userInfo.UUID,
+		Key:  sessionKey.String(),
+		Id:   userInfo.UUID,
+		Cash: initCash,
 	}
 
 	c.JSON(http.StatusOK, res)

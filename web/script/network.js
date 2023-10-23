@@ -11,10 +11,10 @@ async function _guest() {
         })
         .then(res => res.json())
         .then(resGuest =>{
-           if( resGuest["Key"] ){
-               header.set("Session-Key" , resGuest["Key"]);
+            console.log(resGuest);
+           if( resGuest["key"] ){
+               header.set("Session-Key" , resGuest["key"]);
            }
-
            return resGuest
         })
 }

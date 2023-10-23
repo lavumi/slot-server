@@ -26,6 +26,6 @@ func SessionHandler(c *gin.Context) {
 	c.Set("uid", sessionData.UUID)
 	c.Set("cash", sessionData.Cash)
 
-	log.Printf("Session Check %v", sessionData)
+	log.Printf("Session Check %v, %f", sessionData.User, sessionData.Cash)
 	c.Next()
 }

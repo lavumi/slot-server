@@ -28,7 +28,6 @@ spinButton.addEventListener('click', () => {
 
 
 function InitSlotUI() {
-    updateWallet(1000000);
     Network
         .Load()
         .then(res => {
@@ -37,6 +36,12 @@ function InitSlotUI() {
         })
         .then(initPayTable)
         .then(changeGrid)
+        .then(()=>{
+            return Network.Guest()
+        })
+        .then(guestRes=>{
+            updateWallet(guestRes["cash"]);
+        })
 }
 function requestSpin() {
     let bet = 1.0;
@@ -73,7 +78,7 @@ function initPayTable(slotConfig){
         }
     }
 
-    return slotConfig.initialData
+    return slotConfig["initialData"]["spin"]
 }
 
 async function SpinReels() {
@@ -89,7 +94,8 @@ async function SpinReels() {
 }
 
 function changeGrid(spinOutput) {
-    let baseRes = spinOutput.res;
+
+    let baseRes = spinOutput["res"];
 
     let up = baseRes.up;
     let grid = baseRes.reel;
@@ -127,8 +133,7 @@ async function stopSpin(spinOutput) {
 }
 
 function setSpinResult(res) {
-    console.log(res);
-    return res;
+    return res["spin"];
 }
 
 function setWinAmount( spinOutput ){
@@ -209,16 +214,5 @@ function ConvertToBitArray(intNumber) {
 }
 
 //endregion
-
-
-
-
-
-( async ()=>{
-    await Network.Guest()
-        .then(console.log);
-})();
-
-
 
 InitSlotUI();

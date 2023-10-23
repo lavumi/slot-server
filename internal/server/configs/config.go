@@ -1,7 +1,7 @@
 package configs
 
-var InitCash float32
+var InitCash float64
 
 func init() {
-	InitCash = 10000000
+	InitCash = 10000
 }

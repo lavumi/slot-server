@@ -36,6 +36,10 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 	}
 
 	freeSpinMode := s.TotalFreeSpin > 0
+	var totalBet float32 = 0
+	if freeSpinMode == false {
+		totalBet = req.BetCash * 50
+	}
 
 	grid := module.GenRandomGrid(ps.Strips, ps.Column)
 	upSymbols := []int32{11, 12, 13, 14, 10}
@@ -45,10 +49,10 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 	freeSpinWin := module.ScatterWin(grid, ps.FreeSpin, req.BetCash*50)
 
 	var winCash float32 = 0
+
 	for _, win := range lineWins {
 		winCash += win.Win
 	}
-
 	var totalWin float32 = 0
 	if freeSpinMode == false {
 		totalWin = winCash
@@ -89,6 +93,6 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 			}},
 		},
 		State: currentState,
-		Cash:  winCash - req.BetCash*50,
+		Cash:  winCash - totalBet,
 	}, nil
 }

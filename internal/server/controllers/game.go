@@ -25,17 +25,17 @@ func (g *Game) Spin(c *gin.Context) {
 	}
 
 	uid := c.GetString("uid")
+	cash := c.GetFloat64("cash")
 
-	log.Printf("UserID : %s ", uid)
+	log.Printf("UserID : %s | Cash : %f", uid, cash)
 
-	spin, state, cash, err := g.Slot.RequestSpin(0, req.BetCash, nil)
+	spin, state, diff, err := g.Slot.RequestSpin(0, req.BetCash, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	log.Printf("spinState : %s\n", string(state))
-	log.Printf("spinState : %f\n", cash)
 
 	spinObject := make(map[string]interface{})
 	err = json.Unmarshal(spin, &spinObject)
@@ -44,6 +44,10 @@ func (g *Game) Spin(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, spinObject)
+	c.JSON(http.StatusOK, forms.SpinResponse{
+		SpinResult: spinObject,
+		After:      cash + float64(diff),
+		Before:     cash,
+	})
 
 }
