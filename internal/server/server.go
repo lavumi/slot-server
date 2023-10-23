@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"slot-server/internal/server/controllers"
 	"slot-server/internal/server/middleware"
+	"slot-server/internal/server/models"
 	"slot-server/internal/slot"
 	"syscall"
 	"time"
@@ -36,6 +37,8 @@ func initGin() {
 		panic("login to gameController server fail")
 	}
 
+	sessionModel := models.SessionModel{}
+
 	authController := controllers.Auth{}
 	gameController := controllers.Game{
 		Slot: slotClient,
@@ -48,7 +51,7 @@ func initGin() {
 			authRouter.POST("/guest", authController.Guest)
 		}
 		gameRouter := apiRouter.Group("/game")
-		gameRouter.Use(middleware.SessionHandler)
+		gameRouter.Use(middleware.SessionHandler(sessionModel))
 		{
 
 			gameRouter.POST("/:id/enter")

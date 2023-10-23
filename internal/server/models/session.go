@@ -21,14 +21,14 @@ func (m *SessionModel) Initialize() {
 	m.r = db.GetRedis()
 }
 
-func UpsertSession(key uuid.UUID, user User) error {
-	session := Session{
+func (m *SessionModel) UpsertSession(key uuid.UUID, user User) error {
+	s := Session{
 		user,
 		key.String(),
 		time.Now().String(),
 	}
 
-	sessionStr, err := json.Marshal(session)
+	sessionStr, err := json.Marshal(s)
 	if err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ func UpsertSession(key uuid.UUID, user User) error {
 	return nil
 }
 
-func GetSession(key uuid.UUID) (*Session, error) {
+func (m *SessionModel) GetSession(key uuid.UUID) (*Session, error) {
 	if res, err := db.GetRedis().Get(key.String()).Result(); err != nil {
 		return nil, err
 	} else {

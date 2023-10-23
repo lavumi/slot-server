@@ -10,6 +10,7 @@ import (
 )
 
 type Auth struct {
+	sessionModel models.SessionModel
 }
 
 func (a *Auth) Guest(c *gin.Context) {
@@ -22,7 +23,7 @@ func (a *Auth) Guest(c *gin.Context) {
 
 	sessionKey := uuid.New()
 
-	err := models.UpsertSession(sessionKey, userInfo)
+	err := a.sessionModel.UpsertSession(sessionKey, userInfo)
 	if err != nil {
 		return
 	}
