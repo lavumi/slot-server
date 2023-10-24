@@ -103,8 +103,14 @@ func makeGrid(strip []Strip, column int, randoms []int) [][]int {
 
 func AllLineWins(grid [][]int, pays []model.Line, bet float32) []*proto.AllLineWin {
 	var wins []*proto.AllLineWin
+	checked := map[int]bool{}
 
 	for _, initSymbol := range grid[0] {
+		if checked[initSymbol] == true {
+			continue
+		}
+		checked[initSymbol] = true
+
 		var winPos []int32
 		var matchedCount int32 = 1
 		for i := 0; i < len(grid); i++ {

@@ -155,15 +155,17 @@ async function showLineWins(spinOutput){
                 let bit = ConvertToBitArray( winLines[i]);//.toString(2);
                 for (let j = 0; j < bit.length; j++) {
                     if ( bit[j] === 1)
-                        reels[i][j+1].style.animation = 'highlight 0.6s ease infinite';
+                        reels[i][j+1].style.animation = 'highlight 0.6s ease';
                 }
             }
         }
         await waitSec(600);
         for (let i = 0; i < reels.length; i++) {
             if (winLines[i] !== undefined){
-                for (let j = 0; j < winLines[i].length; j++) {
-                    reels[i][winLines[i][j]+1].style.animation = 'none';
+                let bit = ConvertToBitArray( winLines[i]);//.toString(2);
+                for (let j = 0; j < bit.length; j++) {
+                    if ( bit[j] === 1)
+                        reels[i][j+1].style.animation = 'none';
                 }
             }
         }
@@ -171,11 +173,11 @@ async function showLineWins(spinOutput){
     }
 
 
-    // for (let i = 0; loopingLinePay === true; i++) {
-    //     if ( i === linePayList.length )
-    //         i = 0;
-        await linePay(linePayList[0].position);
-    // }
+    for (let i = 0; loopingLinePay === true; i++) {
+        if ( i === linePayList.length )
+            i = 0;
+        await linePay(linePayList[i].position);
+    }
 }
 
 function stopLineWinAnimation(){

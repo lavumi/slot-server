@@ -1,18 +1,15 @@
 {
   "symbols" : {
     "0" : "\uD83C\uDF7A",
-
     "10": "\uD83C\uDF57",
     "11": "\uD83C\uDF56",
     "12": "\uD83C\uDF54",
     "13": "\uD83E\uDD57",
     "14": "\uD83C\uDF55",
-
     "20": "\uD83E\uDD6C",
     "21": "\uD83E\uDD66",
     "22": "\uD83E\uDD6A",
-
-    "99" : "\uD83C\uDF79"
+    "99": "\uD83C\uDF79"
   },
 
   "payout" : {
