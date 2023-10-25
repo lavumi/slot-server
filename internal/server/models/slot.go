@@ -1,7 +1,7 @@
 package models
 
-type UserStateSlot struct {
-	UUID  string  `json:"uuid"`
-	State []byte  `json:"state"`
-	Cash  float64 `json:"cash"`
+type SavedFeature struct {
+	UUID        string `bson:"uuid"`
+	SaveData    []byte `bson:"save-data"`
+	Collectable bool   `bson:"cash"`
 }

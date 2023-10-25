@@ -12,7 +12,7 @@ const (
 	ERR_NOT_ENOUGH_CASH
 	ERR_NEED_CLAIM
 	ERR_NO_NEED_CLAIM
-	ERR_UNKNOWN
+	ErrUnknown
 )
 
 type Error struct {

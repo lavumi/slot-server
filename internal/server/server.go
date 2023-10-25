@@ -35,8 +35,7 @@ func initGin() {
 	nosql := db.MongoDb{}
 	nosql.Initialize(os.Getenv("CLUSTER"), os.Getenv("USER"), os.Getenv("PASS"))
 
-	//init Session
-	//c := nosql.GetCollection("sessions")
+	nosql.SetTTL("save_0", 60)
 
 	//init slot Client
 	slotClient, err := slot.Connect()
@@ -48,6 +47,7 @@ func initGin() {
 	authController := controllers.Auth{}
 	gameController := controllers.Game{
 		Slot: slotClient,
+		Db:   &nosql,
 	}
 
 	apiRouter := r.Group("/api")
@@ -56,11 +56,10 @@ func initGin() {
 		{
 			authRouter.POST("/guest", authController.Guest)
 		}
-		gameRouter := apiRouter.Group("/game")
-		gameRouter.Use(middleware.SessionHandler(db.GetRedis()))
+		gameRouter := apiRouter.Group("/game", middleware.SessionHandler(db.GetRedis()))
 		{
 			gameRouter.POST("/:id/enter")
-			gameRouter.POST("/:id/spin", gameController.Spin)
+			gameRouter.POST("/:id/spin", gameController.Spin, middleware.SaveSession(db.GetRedis()))
 			gameRouter.POST("/:id/collect")
 			gameRouter.GET("/:id/info")
 		}
@@ -77,10 +76,10 @@ func Run() {
 	initGin()
 
 	srv = &http.Server{
-		Addr:        ":8081",
-		Handler:     r,
-		ReadTimeout: 10 * time.Second,
-		//WriteTimeout:   10 * time.Second,
+		Addr:           ":8081",
+		Handler:        r,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 

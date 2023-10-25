@@ -4,8 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/net/context"
 	"log"
 	"net/http"
+	"slot-server/internal/db"
 	"slot-server/internal/server/forms"
 	"slot-server/internal/server/models"
 	"slot-server/internal/slot"
@@ -13,6 +17,7 @@ import (
 
 type Game struct {
 	Slot *slot.Client
+	Db   *db.MongoDb
 }
 
 func (g *Game) Spin(c *gin.Context) {
@@ -26,13 +31,28 @@ func (g *Game) Spin(c *gin.Context) {
 		return
 	}
 
+	//1. Get User Data From Session
+	slotId := req.Id
 	user := c.MustGet("user").(models.User)
-	//key := session.Get("key").(string)
+	cash := user.Cash
 
 	log.Printf("UserID : %s | Cash : %f", user.UUID, user.Cash)
-	user.Cash += 1000
 
-	spin, additionalInfo, err := g.Slot.RequestSpin(0, req.BetCash, nil)
+	//2. Get User Data From Db
+	var save = models.SavedFeature{}
+	filter := bson.D{{"uuid", user.UUID}}
+	if err := g.Db.GetCollection(fmt.Sprintf("save_%d", slotId)).FindOne(context.TODO(), filter).Decode(&save); err != nil {
+		if err != mongo.ErrNoDocuments {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		} else {
+			save.UUID = user.UUID
+		}
+	}
+
+	log.Printf("Saved Feature : %v ", save.SaveData == nil)
+
+	spin, additionalInfo, err := g.Slot.RequestSpin(slotId, req.BetCash, save.SaveData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
@@ -45,14 +65,22 @@ func (g *Game) Spin(c *gin.Context) {
 		return
 	}
 
-	userAfter := c.MustGet("user").(models.User)
-	log.Printf("UserID : %s | Cash : %f", userAfter.UUID, userAfter.Cash)
-	cashAfter := user.Cash + additionalInfo.CashDiff
+	user.Cash = cash + additionalInfo.CashDiff
+	c.Set("user", user)
+
+	save.SaveData = additionalInfo.SavedFeature
+	save.Collectable = additionalInfo.Collectable
+
+	if _, err := g.Db.GetCollection(fmt.Sprintf("save_%d", slotId)).UpdateOne(context.TODO(), filter, save); err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		//todo rollback session
+		return
+	}
 
 	c.JSON(http.StatusOK, forms.SpinResponse{
 		SpinResult: spinObject,
-		After:      cashAfter,
-		Before:     user.Cash,
+		After:      user.Cash,
+		Before:     cash,
 	})
 
 }

@@ -1,6 +1,6 @@
 package models
 
 type User struct {
-	UUID string  `json:"uuid"`
-	Cash float64 `json:"cash"`
+	UUID string  `bson:"uuid"`
+	Cash float64 `bson:"cash"`
 }

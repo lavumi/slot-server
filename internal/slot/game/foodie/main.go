@@ -29,7 +29,7 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 	if req.PrevState != nil {
 		if err := json.Unmarshal(req.PrevState, &s); err != nil {
 			return nil, &model.Error{
-				Code:    model.ERR_UNKNOWN,
+				Code:    model.ErrUnknown,
 				Message: "FailToParseStateData",
 			}
 		}
@@ -69,7 +69,7 @@ func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 	currentState, err := json.Marshal(s)
 	if err != nil {
 		return nil, &model.Error{
-			Code:    model.ERR_UNKNOWN,
+			Code:    model.ErrUnknown,
 			Message: "FailToParseStateData",
 		}
 	}

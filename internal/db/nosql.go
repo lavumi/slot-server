@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
+	"log"
 	"net/url"
 )
 
@@ -46,6 +47,22 @@ func (m *MongoDb) Initialize(cluster string, username string, password string) {
 
 func (m *MongoDb) GetCollection(name string) *mongo.Collection {
 	return m.database.Collection(name)
+}
+
+func (m *MongoDb) SetTTL(name string, expireSecond int32) {
+	indexName, err := m.database.Collection(name).Indexes().CreateOne(
+		context.Background(),
+		mongo.IndexModel{
+			Keys: bson.M{
+				"expire_at": 1,
+			},
+			Options: options.Index().SetExpireAfterSeconds(expireSecond),
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Created TTL index: %s\n", indexName)
 }
 
 func (m *MongoDb) DisConnect() {
