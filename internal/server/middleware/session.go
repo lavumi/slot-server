@@ -1,35 +1,38 @@
 package middleware
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"log"
 	"net/http"
+	"slot-server/internal/db"
 	"slot-server/internal/server/models"
 )
 
-func SessionHandler(sessionModel models.SessionModel) gin.HandlerFunc {
+func SessionHandler(rds *db.PseudoRedis) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		sessionKey := c.GetHeader("session-Key")
-		sessionUUID, err := uuid.Parse(sessionKey)
+		sessionKey := c.GetHeader("session-key")
+		sessionString, err := rds.Get(sessionKey).Result()
 		if err != nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"msg": err.Error(),
+			})
 			return
 		}
 
-		sessionData, err := sessionModel.GetSession(sessionUUID)
+		session := models.Session{}
+
+		//sessionData := make(map[string]string)
+		err = json.Unmarshal([]byte(sessionString), &session)
 		if err != nil {
-			log.Printf("get session error : %s", err.Error())
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"msg": err.Error(),
+			})
 			return
 		}
 
-		c.Set("uid", sessionData.UUID)
-		c.Set("cash", sessionData.Cash)
-
-		log.Printf("session Check %v, %f", sessionData.User, sessionData.Cash)
+		c.Set("user", session.User)
+		log.Printf("session Check %v", session.User)
 		c.Next()
 	}
 }
-
-//func SessionHandler

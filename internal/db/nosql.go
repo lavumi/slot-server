@@ -16,14 +16,20 @@ type MongoDb struct {
 
 func (m *MongoDb) Initialize(cluster string, username string, password string) {
 
-	uri := "mongodb://" + url.QueryEscape(username) + ":" +
-		url.QueryEscape(password) + "@" + cluster +
-		"/admin"
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	opts := options.Client().ApplyURI("mongodb+srv://" +
+		url.QueryEscape(username) + ":" +
+		url.QueryEscape(password) + "@" +
+		cluster + "/?retryWrites=true&w=majority").SetServerAPIOptions(serverAPI)
 
-	fmt.Println(uri)
+	//uri := "mongodb://" + url.QueryEscape(username) + ":" +
+	//	url.QueryEscape(password) + "@" + cluster +
+	//	"/admin"
+
+	//fmt.Println(uri)
 	var err error
 
-	m.client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	m.client, err = mongo.Connect(context.TODO(), opts)
 
 	if err != nil {
 		panic(err)

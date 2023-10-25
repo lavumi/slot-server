@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"slot-server/internal/db"
 	"slot-server/internal/server/controllers"
 	"slot-server/internal/server/middleware"
-	"slot-server/internal/server/models"
 	"slot-server/internal/slot"
 	"syscall"
 	"time"
@@ -32,13 +32,19 @@ func initGin() {
 	r.Use(gin.Recovery())
 	r.Use(static.Serve("/", static.LocalFile("./web", false)))
 
+	nosql := db.MongoDb{}
+	nosql.Initialize(os.Getenv("CLUSTER"), os.Getenv("USER"), os.Getenv("PASS"))
+
+	//init Session
+	//c := nosql.GetCollection("sessions")
+
+	//init slot Client
 	slotClient, err := slot.Connect()
 	if err != nil {
-		panic("login to gameController server fail")
+		panic("connect to gameController server fail")
 	}
 
-	sessionModel := models.SessionModel{}
-
+	//init controllers
 	authController := controllers.Auth{}
 	gameController := controllers.Game{
 		Slot: slotClient,
@@ -51,9 +57,8 @@ func initGin() {
 			authRouter.POST("/guest", authController.Guest)
 		}
 		gameRouter := apiRouter.Group("/game")
-		gameRouter.Use(middleware.SessionHandler(sessionModel))
+		gameRouter.Use(middleware.SessionHandler(db.GetRedis()))
 		{
-
 			gameRouter.POST("/:id/enter")
 			gameRouter.POST("/:id/spin", gameController.Spin)
 			gameRouter.POST("/:id/collect")

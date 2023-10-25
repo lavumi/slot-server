@@ -13,7 +13,7 @@ async function _guest() {
         .then(resGuest =>{
             console.log(resGuest);
            if( resGuest["key"] ){
-               header.set("Session-Key" , resGuest["key"]);
+               header.set("session-key" , resGuest["key"]);
            }
            return resGuest
         })

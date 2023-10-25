@@ -47,13 +47,13 @@ function requestSpin() {
     let bet = 1.0;
     let line = 50;
     loopingLinePay = false;
-    updateWallet(-bet * line);
+    updateWallet(wallet - bet * line);
     stopLineWinAnimation();
     SpinReels()
         .then(() => {
         return Network.Spin(0, bet)
     })
-        .then(setSpinResult)
+        // .then(setSpinResult)
         .then(changeGrid)
         .then(stopSpin)
         .then(setWinAmount)
@@ -78,7 +78,7 @@ function initPayTable(slotConfig){
         }
     }
 
-    return slotConfig["initialData"]["spin"]
+    return slotConfig["initialData"]
 }
 
 async function SpinReels() {
@@ -95,7 +95,7 @@ async function SpinReels() {
 
 function changeGrid(spinOutput) {
 
-    let baseRes = spinOutput["res"];
+    let baseRes = spinOutput["spin"]["res"];
 
     let up = baseRes.up;
     let grid = baseRes.reel;
@@ -133,19 +133,21 @@ async function stopSpin(spinOutput) {
 }
 
 function setSpinResult(res) {
+    // updateWallet(res["after"]);
+
     return res["spin"];
 }
 
 function setWinAmount( spinOutput ){
 
-    let winAmount = spinOutput.res.win ?? 0;
+    let winAmount = spinOutput["spin"].res.win ?? 0;
     winAmountTxt.innerHTML = `$ ${winAmount}`;
-    updateWallet(winAmount);
+    updateWallet(spinOutput["after"])
     return spinOutput;
 }
 
 async function showLineWins(spinOutput){
-    let linePayList = spinOutput.res.lineWins;
+    let linePayList = spinOutput["spin"].res.lineWins;
     console.log(linePayList);
     if (!!linePayList === false ) return;
     loopingLinePay = true;
@@ -190,8 +192,8 @@ function stopLineWinAnimation(){
     }
 }
 
-function updateWallet(amount){
-    wallet += amount;
+function updateWallet(cash){
+    wallet = cash;
     walletText.innerHTML = `$ ${wallet.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 

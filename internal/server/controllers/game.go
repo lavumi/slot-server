@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"slot-server/internal/server/forms"
+	"slot-server/internal/server/models"
 	"slot-server/internal/slot"
 )
 
@@ -15,6 +16,7 @@ type Game struct {
 }
 
 func (g *Game) Spin(c *gin.Context) {
+
 	var req forms.SpinRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		//c.JSON(400, gin.H{"msg": err})
@@ -24,18 +26,17 @@ func (g *Game) Spin(c *gin.Context) {
 		return
 	}
 
-	uid := c.GetString("uid")
-	cash := c.GetFloat64("cash")
+	user := c.MustGet("user").(models.User)
+	//key := session.Get("key").(string)
 
-	log.Printf("UserID : %s | Cash : %f", uid, cash)
+	log.Printf("UserID : %s | Cash : %f", user.UUID, user.Cash)
+	user.Cash += 1000
 
-	spin, state, diff, err := g.Slot.RequestSpin(0, req.BetCash, nil)
+	spin, additionalInfo, err := g.Slot.RequestSpin(0, req.BetCash, nil)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	log.Printf("spinState : %s\n", string(state))
 
 	spinObject := make(map[string]interface{})
 	err = json.Unmarshal(spin, &spinObject)
@@ -44,10 +45,14 @@ func (g *Game) Spin(c *gin.Context) {
 		return
 	}
 
+	userAfter := c.MustGet("user").(models.User)
+	log.Printf("UserID : %s | Cash : %f", userAfter.UUID, userAfter.Cash)
+	cashAfter := user.Cash + additionalInfo.CashDiff
+
 	c.JSON(http.StatusOK, forms.SpinResponse{
 		SpinResult: spinObject,
-		After:      cash + float64(diff),
-		Before:     cash,
+		After:      cashAfter,
+		Before:     user.Cash,
 	})
 
 }

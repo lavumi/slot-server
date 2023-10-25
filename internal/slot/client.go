@@ -15,6 +15,12 @@ type Client struct {
 	proto.SlotClient
 }
 
+type AdditionalInfo struct {
+	SavedFeature []byte
+	CashDiff     float64
+	Collectable  bool
+}
+
 func Connect() (*Client, error) {
 	conn, err := grpc.Dial("localhost:8088", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -26,7 +32,7 @@ func Connect() (*Client, error) {
 	return &Client{SlotClient: c}, nil
 }
 
-func (c *Client) RequestSpin(slotId uint32, bet float32, prevState []byte) ([]byte, []byte, float32, error) {
+func (c *Client) RequestSpin(slotId uint32, bet float32, prevState []byte) ([]byte, *AdditionalInfo, error) {
 	req := &proto.Request{
 		SlotId:    slotId,
 		BetCash:   bet,
@@ -35,10 +41,16 @@ func (c *Client) RequestSpin(slotId uint32, bet float32, prevState []byte) ([]by
 	}
 
 	if spin, err := c.Spin(context.Background(), req); err != nil {
-		return nil, nil, 0, status.Errorf(codes.Internal, "Error on spin %s", err.Error())
+		return nil, nil, status.Errorf(codes.Internal, "Error on spin %s", err.Error())
 	} else if res, err := protojson.Marshal(spin.GetResult()); err != nil {
-		return nil, nil, 0, status.Errorf(codes.DataLoss, "Marshal Spin response failed %s", err.Error())
+		return nil, nil, status.Errorf(codes.DataLoss, "Marshal Spin response failed %s", err.Error())
 	} else {
-		return res, spin.GetState(), spin.GetCash(), nil
+		state := &AdditionalInfo{
+			SavedFeature: spin.GetState(),
+			CashDiff:     float64(spin.GetCash()),
+			Collectable:  false,
+		}
+		return res, state, nil
+
 	}
 }
