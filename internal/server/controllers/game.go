@@ -7,7 +7,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/net/context"
-	"log"
 	"net/http"
 	"slot-server/internal/db"
 	"slot-server/internal/server/forms"
@@ -36,7 +35,7 @@ func (g *Game) Spin(c *gin.Context) {
 	user := c.MustGet("user").(models.User)
 	cash := user.Cash
 
-	log.Printf("UserID : %s | Cash : %f", user.UUID, user.Cash)
+	//log.Printf("UserID : %s | Cash : %f", user.UUID, user.Cash)
 
 	//2. Get User Data From Db
 	var save = models.SavedFeature{}
@@ -49,15 +48,14 @@ func (g *Game) Spin(c *gin.Context) {
 			save.UUID = user.UUID
 		}
 	}
+	//log.Printf("Saved Feature : %v ", save.SaveData == nil)
 
-	log.Printf("Saved Feature : %v ", save.SaveData == nil)
-
+	//3. Spin
 	spin, additionalInfo, err := g.Slot.RequestSpin(slotId, req.BetCash, save.SaveData)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	spinObject := make(map[string]interface{})
 	err = json.Unmarshal(spin, &spinObject)
 	if err != nil {
@@ -65,13 +63,12 @@ func (g *Game) Spin(c *gin.Context) {
 		return
 	}
 
+	//4. handle response
 	user.Cash = cash + additionalInfo.CashDiff
 	c.Set("user", user)
 
-	save.SaveData = additionalInfo.SavedFeature
-	save.Collectable = additionalInfo.Collectable
-
-	if _, err := g.Db.GetCollection(fmt.Sprintf("save_%d", slotId)).UpdateOne(context.TODO(), filter, save); err != nil {
+	update := bson.D{{"$set", bson.D{{"save", additionalInfo.SavedFeature}, {"c", additionalInfo.Collectable}}}}
+	if _, err := g.Db.GetCollection(fmt.Sprintf("save_%d", slotId)).UpdateOne(context.TODO(), filter, update); err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		//todo rollback session
 		return
