@@ -11,11 +11,11 @@ import (
 	"slot-server/internal/db"
 	"slot-server/internal/server/forms"
 	"slot-server/internal/server/models"
-	"slot-server/internal/slot"
+	"slot-server/internal/server/rpc"
 )
 
 type Game struct {
-	Slot *slot.Client
+	Slot *rpc.Client
 	Db   *db.MongoDb
 }
 

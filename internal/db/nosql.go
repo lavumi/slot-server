@@ -50,7 +50,7 @@ func (m *MongoDb) GetCollection(name string) *mongo.Collection {
 }
 
 func (m *MongoDb) SetTTL(name string, expireSecond int32) {
-	indexName, err := m.database.Collection(name).Indexes().CreateOne(
+	_, err := m.database.Collection(name).Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
 			Keys: bson.M{
@@ -62,7 +62,6 @@ func (m *MongoDb) SetTTL(name string, expireSecond int32) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Created TTL index: %s\n", indexName)
 }
 
 func (m *MongoDb) DisConnect() {

@@ -3,7 +3,6 @@ package middleware
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"slot-server/internal/db"
 	"slot-server/internal/server/models"
@@ -35,7 +34,7 @@ func SessionHandler(rds *db.PseudoRedis) gin.HandlerFunc {
 		}
 
 		c.Set("user", session.User)
-		log.Printf("session Check %v", session.User)
+		//log.Printf("session Check %v", session.User)
 		c.Next()
 	}
 }

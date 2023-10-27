@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 	"log"
 	"net/http"
@@ -12,7 +11,7 @@ import (
 	"slot-server/internal/db"
 	"slot-server/internal/server/controllers"
 	"slot-server/internal/server/middleware"
-	"slot-server/internal/slot"
+	"slot-server/internal/server/rpc"
 	"syscall"
 	"time"
 )
@@ -38,7 +37,7 @@ func initGin() {
 	nosql.SetTTL("save_0", 60)
 
 	//init slot Client
-	slotClient, err := slot.Connect()
+	slotClient, err := rpc.DialToSlotServer()
 	if err != nil {
 		panic("connect to gameController server fail")
 	}
@@ -68,11 +67,6 @@ func initGin() {
 
 func Run() {
 
-	err := godotenv.Load(".web.dev.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	initGin()
 
 	srv = &http.Server{
@@ -83,8 +77,7 @@ func Run() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	err = srv.ListenAndServe()
-	if err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		log.Panic(err.Error())
 		return
 	}

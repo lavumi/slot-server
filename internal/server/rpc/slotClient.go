@@ -1,4 +1,4 @@
-package slot
+package rpc
 
 import (
 	"golang.org/x/net/context"
@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"log"
+	"os"
 	"slot-server/internal/slot/api/proto"
 )
 
@@ -21,8 +22,11 @@ type AdditionalInfo struct {
 	Collectable  bool
 }
 
-func Connect() (*Client, error) {
-	conn, err := grpc.Dial("localhost:8088", grpc.WithTransportCredentials(insecure.NewCredentials()))
+func DialToSlotServer() (*Client, error) {
+
+	slotUri := os.Getenv("SLOT_URI")
+	log.Printf("Slot Server Uri : %s\n", slotUri)
+	conn, err := grpc.Dial(slotUri, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Couldnt connect to slot Service: %v", err)
 		return nil, err

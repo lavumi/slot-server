@@ -63,23 +63,11 @@ Listed below are the versions of the frameworks used in this project.
 
 ## Installation
 
-todo improve
-
 ```bash
-env GOOS=linux go build -o slot-server cmd/main.go
-docker build -t slot-server:latest .
-docker save -o slot-server.tar slot-server
-rm slot-server
+env GOOS=linux go build -o build/web-server cmd/web.go
+env GOOS=linux go build -o build/slot-server cmd/slot.go
+docker build -f Web.Dockerfile -t web-server:latest .
+docker build -f Slot.Dockerfile -t slot-server:latest .
+docker compose up -d
 ```
 ## Usage
-
-```bash
-go run cmd/main.go
-```
-
-
-
-[//]: # (- at remote)
-[//]: # (```bash)
-[//]: # ( docker load -i slot-server.tar)
-[//]: # (```)
