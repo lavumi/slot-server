@@ -1,6 +1,5 @@
 'use strict'
 
-
 let header = new Headers();
 
 async function _guest() {
@@ -11,7 +10,6 @@ async function _guest() {
         })
         .then(res => res.json())
         .then(resGuest =>{
-            console.log(resGuest);
            if( resGuest["key"] ){
                header.set("session-key" , resGuest["key"]);
            }
@@ -19,15 +17,12 @@ async function _guest() {
         })
 }
 
-
-
 async function _loadSheet(){
     return await fetch(`/config/0.json`)
         .then(res => res.json())
 }
 
 async function _spin(slotId, bet) {
-
     let body = JSON.stringify({
         index: 1,
         counter: 1,
@@ -42,7 +37,6 @@ async function _spin(slotId, bet) {
         })
         .then(res => res.json())
 }
-
 
 let Network = {
     Spin : _spin,

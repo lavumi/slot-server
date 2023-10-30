@@ -132,11 +132,6 @@ async function stopSpin(spinOutput) {
     return spinOutput;
 }
 
-function setSpinResult(res) {
-    // updateWallet(res["after"]);
-
-    return res["spin"];
-}
 
 function setWinAmount( spinOutput ){
 
@@ -197,8 +192,7 @@ function updateWallet(cash){
     walletText.innerHTML = `$ ${wallet.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 
-
-
+//endregion
 
 //region [ UTIL ]
 function waitSec(time) {

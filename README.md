@@ -38,7 +38,6 @@ Listed below are the versions of the frameworks used in this project.
 │   ├── web.go                  # REST api server start point
 │   └── slot.go                 # gRPC slot server start point
 ├── internal/
-│   ├── auth/                   # Authorization Service
 │   ├── db/                     # database connections (mongodb, redis)
 │   ├── server/                 # Server Service
 │   │   ├── configs/          
@@ -70,7 +69,7 @@ Listed below are the versions of the frameworks used in this project.
 ```bash
 env GOOS=linux go build -o build/web-server cmd/web.go
 env GOOS=linux go build -o build/slot-server cmd/slot.go
-docker build -f Web.Dockerfile -t web-server:latest .
+docker build -f Web.Dockerfile -t web-server:0.0.5 .
 docker build -f Slot.Dockerfile -t slot-server:latest .
 docker compose up -d
 ```
