@@ -34,28 +34,32 @@ Listed below are the versions of the frameworks used in this project.
 ```text
 /slot-server/
 ├── cmd/
-│   ├── main.go                 # server start point
-│   └── test.go                 # for slot unit test...
-├── configs/                    # slot par sheet and slot list
+│   ├── main.go                 # run web, slot both
+│   ├── web.go                  # REST api server start point
+│   └── slot.go                 # gRPC slot server start point
 ├── internal/
 │   ├── auth/                   # Authorization Service
-│   ├── database/               # Mongo db data connections
+│   ├── db/                     # database connections (mongodb, redis)
 │   ├── server/                 # Server Service
+│   │   ├── configs/          
+│   │   ├── controllers/          
+│   │   ├── forms/          
 │   │   ├── middleware/          
 │   │   ├── model/               
-│   │   ├── router/              
-│   │   └── server.go           # server start point
+│   │   ├── rpc/                    # slot gRPC client
+│   │   └── server.go               # server start point
 │   └── slot/                   # Slot Service
-│       ├── config/             # Config struct
-│       ├── model/              # models for slot
-│       ├── module/             # modules
-│       ├── game/               # Slot main logics
-│       │     └── foodie/       # Foodie Reels (Slot00)
-│       └── manager.go          # manager
-└── web/                        # Not used. We had plans to set up RAID 1 later.
-    ├── config/                 # configs for client ( symbol data and paytable )
-    ├── script/                 # client code
-    └── ...                     # Slot web view
+│       ├── api/                    # slot api (made from protobuf)
+│       ├── game/                   # Slot main logics
+│       │     └── foodie/               # Foodie Reels (Slot00)
+│       ├── model/                  # models for slot
+│       ├── module/                 # modules
+│       ├── proto/                  # slot protobuf
+│       └── manager.go              # manager
+└── web/                        # Web Front static pages
+    ├── config/                     # configs for client ( symbol data and paytable )
+    ├── script/                     # client code
+    └── ...                         # Slot web view
 ```
 
 
