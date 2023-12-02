@@ -15,6 +15,20 @@ type Service struct {
 	proto.UnimplementedSlotServer
 }
 
+func (s *Service) Enter(_ context.Context, req *proto.Request) (*proto.EnterResponse, error) {
+	switch req.GetSlotId() {
+	case 0:
+		if foodieRes, err := foodie.Enter(); err != nil {
+			return nil, status.Errorf(codes.Internal, "foodie slot spin error %s", err.Error())
+		} else {
+			return foodieRes, nil
+		}
+	default:
+		return nil, status.Errorf(codes.Unimplemented, "method Spin not implemented")
+	}
+
+}
+
 func (s *Service) Spin(_ context.Context, req *proto.Request) (*proto.SpinResponse, error) {
 	switch req.GetSlotId() {
 	case 0:
@@ -42,4 +56,6 @@ func Run() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("fail to serve slot Service: %v", err)
 	}
+
+	log.Printf("Slot Server Launched\n")
 }

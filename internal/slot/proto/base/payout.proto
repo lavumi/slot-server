@@ -1,0 +1,8 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+message Payout {
+  uint32 symbol = 1;
+  repeated float payout = 2;
+}

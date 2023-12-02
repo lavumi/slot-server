@@ -1,5 +1,18 @@
 package forms
 
+type EnterRequest struct {
+	BaseRequest
+	EnterInput
+}
+
+type EnterInput struct {
+	Id uint32 `json:"id"`
+}
+
+type EnterResponse struct {
+	GameInfo map[string]interface{} `json:"gameInfo"`
+}
+
 type SpinRequest struct {
 	BaseRequest
 	SpinInput

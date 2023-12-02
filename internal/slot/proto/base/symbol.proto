@@ -1,0 +1,8 @@
+syntax = "proto3";
+package slot;
+option go_package = "./proto";
+
+message Symbol {
+  string index = 1;
+  string img = 2;
+}

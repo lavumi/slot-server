@@ -19,6 +19,37 @@ type Game struct {
 	Db   *db.MongoDb
 }
 
+func (g *Game) Enter(c *gin.Context) {
+	var req forms.EnterRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		//c.JSON(400, gin.H{"msg": err})
+		fmt.Println("EnterRequest", err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		//SendError(c, 400, err.Error())
+		return
+	}
+
+	//1. Get User Data From Session
+	slotId := req.Id
+
+	gameInfo, err := g.Slot.EnterSlot(slotId, 0, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	gameInfoObject := make(map[string]interface{})
+	err = json.Unmarshal(gameInfo, &gameInfoObject)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, forms.EnterResponse{
+		GameInfo: gameInfoObject,
+	})
+}
+
 func (g *Game) Spin(c *gin.Context) {
 
 	var req forms.SpinRequest

@@ -17,9 +17,18 @@ async function _guest() {
         })
 }
 
-async function _loadSheet(){
-    return await fetch(`/config/0.json`)
+async function _enter(slotId){
+    let body = JSON.stringify({
+        index: 1,
+    });
+    return await fetch(`/api/game/${slotId}/enter`,
+        {
+            method: "POST",
+            headers: header,
+            body:body
+        })
         .then(res => res.json())
+        .then(res => res["gameInfo"]);
 }
 
 async function _spin(slotId, bet) {
@@ -40,6 +49,6 @@ async function _spin(slotId, bet) {
 
 let Network = {
     Spin : _spin,
-    Load : _loadSheet,
-    Guest : _guest
+    Guest : _guest,
+    Enter : _enter
 }

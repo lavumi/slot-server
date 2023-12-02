@@ -20,6 +20,7 @@ Listed below are the versions of the frameworks used in this project.
 
 - Golang: v1.19
 - Gin: v1.9.1
+- Protocol Buffer: v25.1
 
 ### Database
 

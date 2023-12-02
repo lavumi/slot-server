@@ -16,7 +16,7 @@ const walletText = document.querySelector('.wallet span');
 const spinTimeInterval = 100;
 let wallet = 0;
 
-let symbols = null;
+let symbols = {};
 let isSpinning = false;
 let loopingLinePay = false
 spinButton.addEventListener('click', () => {
@@ -29,11 +29,8 @@ spinButton.addEventListener('click', () => {
 
 function InitSlotUI() {
     Network
-        .Load()
-        .then(res => {
-            symbols = res.symbols;
-            return res;
-        })
+        .Enter(0)
+        .then(initializeSymbolTable)
         .then(initPayTable)
         .then(changeGrid)
         .then(()=>{
@@ -43,6 +40,9 @@ function InitSlotUI() {
             updateWallet(guestRes["cash"]);
         })
 }
+
+
+
 function requestSpin() {
     let bet = 1.0;
     let line = 50;
@@ -53,7 +53,6 @@ function requestSpin() {
         .then(() => {
         return Network.Spin(0, bet)
     })
-        // .then(setSpinResult)
         .then(changeGrid)
         .then(stopSpin)
         .then(setWinAmount)
@@ -62,23 +61,36 @@ function requestSpin() {
 
 
 //region [ UI ]
+function initializeSymbolTable(gameInfo){
+
+    for (let i = 0; i < gameInfo.symbols.length; i++) {
+        let obj = gameInfo.symbols[i];
+        symbols[obj.index] = obj.img;
+    }
+    return gameInfo;
+}
 
 function initPayTable(slotConfig){
-    let payouts = slotConfig.payout;
+    let payoutTable = slotConfig.payout;
 
-    for (const symbolId in payouts) {
+
+
+    for (let i = 0; i < payoutTable.length; i++) {
+        let symbolId = payoutTable[i].symbol;
         let symbol = symbols[symbolId];
-        for (let i = 0; i < payouts[symbolId].length; i++) {
-            if ( payouts[symbolId][i] > 0 ){
+        let payout = payoutTable[i].payout;
+
+        for (let i = 0; i < payout.length; i++) {
+            if ( payout[i] > 0 ){
                 for (let j = 0; j < i+1; j++) {
                     payTable.innerHTML += symbol;
                 }
-                payTable.innerHTML += `&nbsp x ${payouts[symbolId][i]}<br>`;
+                payTable.innerHTML += `&nbsp x ${payout[i]}<br>`;
             }
         }
     }
 
-    return slotConfig["initialData"]
+    return {spin:{res:slotConfig}};
 }
 
 async function SpinReels() {
@@ -96,7 +108,6 @@ async function SpinReels() {
 function changeGrid(spinOutput) {
 
     let baseRes = spinOutput["spin"]["res"];
-
     let up = baseRes.up;
     let grid = baseRes.reel;
     let down = baseRes.dn;
@@ -134,8 +145,7 @@ async function stopSpin(spinOutput) {
 
 
 function setWinAmount( spinOutput ){
-
-    let winAmount = spinOutput["spin"].res.win ?? 0;
+    let winAmount = spinOutput["spin"]["res"].win ?? 0;
     winAmountTxt.innerHTML = `$ ${winAmount}`;
     updateWallet(spinOutput["after"])
     return spinOutput;

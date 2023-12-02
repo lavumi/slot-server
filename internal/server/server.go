@@ -57,7 +57,7 @@ func initGin() {
 		}
 		gameRouter := apiRouter.Group("/game", middleware.SessionHandler(db.GetRedis()))
 		{
-			gameRouter.POST("/:id/enter")
+			gameRouter.POST("/:id/enter", gameController.Enter, middleware.SaveSession(db.GetRedis()))
 			gameRouter.POST("/:id/spin", gameController.Spin, middleware.SaveSession(db.GetRedis()))
 			gameRouter.POST("/:id/collect")
 			gameRouter.GET("/:id/info")

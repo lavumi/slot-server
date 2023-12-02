@@ -4,6 +4,8 @@ option go_package = "./proto";
 
 import "base/request.proto";
 import "base/result.proto";
+import "base/symbol.proto";
+import "base/payout.proto";
 
 import "foodie.proto";
 import "dragon.proto";
@@ -23,7 +25,12 @@ message SpinResponse {
 }
 
 message EnterResponse {
-  repeated float BetTable = 1;
+  repeated float betTable = 1;
+  repeated Symbol symbols = 2;
+  repeated sfixed32 up = 3;
+  repeated Strip reel = 4;
+  repeated sfixed32 dn = 5;
+  repeated Payout payout = 6;
 }
 
 service Slot {

@@ -24,6 +24,26 @@ func init() {
 	}
 }
 
+func Enter() (*proto.EnterResponse, *model.Error) {
+
+	grid := [][]int{
+		{12, 14, 11},
+		{14, 13, 20},
+		{20, 12, 12},
+		{20, 13, 10},
+		{21, 14, 22},
+	}
+
+	return &proto.EnterResponse{
+		BetTable: ps.Bets,
+		Symbols:  api.SymbolTableConvert(ps.Symbols),
+		Up:       []int32{11, 12, 13, 14, 10},
+		Reel:     api.GridConvert(grid),
+		Dn:       []int32{11, 12, 13, 14, 10},
+		Payout:   api.PayLineConvert(ps.Pays),
+	}, nil
+}
+
 func Spin(req *proto.Request) (*proto.SpinResponse, *model.Error) {
 	s := state{}
 	if req.PrevState != nil {

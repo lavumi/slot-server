@@ -36,6 +36,23 @@ func DialToSlotServer() (*Client, error) {
 	return &Client{SlotClient: c}, nil
 }
 
+func (c *Client) EnterSlot(slotId uint32, bet float32, prevState []byte) ([]byte, error) {
+	req := &proto.Request{
+		SlotId:    slotId,
+		BetCash:   bet,
+		BetLine:   0,
+		PrevState: prevState,
+	}
+
+	if spin, err := c.Enter(context.Background(), req); err != nil {
+		return nil, status.Errorf(codes.Internal, "Error on spin %s", err.Error())
+	} else if res, err := protojson.Marshal(spin); err != nil {
+		return nil, status.Errorf(codes.DataLoss, "Marshal Spin response failed %s", err.Error())
+	} else {
+		return res, nil
+	}
+}
+
 func (c *Client) RequestSpin(slotId uint32, bet float32, prevState []byte) ([]byte, *AdditionalInfo, error) {
 	req := &proto.Request{
 		SlotId:    slotId,
