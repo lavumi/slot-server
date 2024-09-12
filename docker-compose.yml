@@ -7,18 +7,30 @@ services:
     ports:
       - "3000:8081"
     environment:
-      CLUSTER: ${DB_CLUSTER}
-      USER: ${DB_USER}
-      PASS: ${DB_PASS}
+      CLUSTER: mongo:27017
+      USER: lavumi
+      PASS: example
       SLOT_URI: slot:8088
-    networks:
-      - slot
   slot-rpc:
     container_name: slot
     image: slot-server:latest
     restart: always
-    networks:
-      - slot
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: lavumi
+      MONGO_INITDB_ROOT_PASSWORD: example
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: lavumi
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://lavumi:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
 
 networks:
     slot:

@@ -18,7 +18,7 @@ type MongoDb struct {
 func (m *MongoDb) Initialize(cluster string, username string, password string) {
 
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI("mongodb+srv://" +
+	opts := options.Client().ApplyURI("mongodb://" +
 		url.QueryEscape(username) + ":" +
 		url.QueryEscape(password) + "@" +
 		cluster + "/?retryWrites=true&w=majority").SetServerAPIOptions(serverAPI)
