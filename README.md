@@ -1,5 +1,9 @@
 # Slot Server
-web base slot game server
+A web-based slot game server built with Go, featuring:
+- Separate REST API and gRPC slot game servers
+- MongoDB for data persistence
+- Real-time game logic processing
+- Web-based client interface
 
 
 ## Table of Contents
@@ -68,10 +72,20 @@ Listed below are the versions of the frameworks used in this project.
 ## Installation
 
 ```bash
-env GOOS=linux go build -o build/web-server cmd/web.go
-env GOOS=linux go build -o build/slot-server cmd/slot.go
-docker build -f Web.Dockerfile -t web-server:latest .
-docker build -f Slot.Dockerfile -t slot-server:latest .
+# Web Server build
+docker build --target web-server -t web-server:latest .
+
+# Slot Server build
+docker build --target slot-server -t slot-server:latest .
+
 docker compose up -d
 ```
+
+
 ## Usage
+
+### API Endpoints
+- `POST /api/auth/guest`: User authentication
+- `POST /api/game/{slotId}/spin`: Process a spin request
+
+
